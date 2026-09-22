@@ -1,5 +1,10 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>P Studio</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --bg: #FFFFFF;
@@ -43,9 +48,9 @@
     --rejected: #C33F2E;
     --rejected-soft: #F5DFDB;
 
-    --font-display: 'Inter', Helvetica, Arial, sans-serif;
-    --font-body: 'Inter', Helvetica, Arial, sans-serif;
-    --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+    --font-display: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Ubuntu, "Helvetica Neue", Arial, sans-serif;
+    --font-body: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Ubuntu, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -331,6 +336,48 @@
     font-size: 15px;
     max-width: 50ch;
   }
+  .topbar-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+
+  /* ---------- notificações centralizadas ---------- */
+  .notif-bell {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background .15s ease, color .15s ease, transform .1s ease;
+  }
+  .notif-bell:hover { background: var(--surface-2); color: var(--text); }
+  .notif-bell:active { transform: scale(0.94); }
+  .notif-bell svg { width: 19px; height: 19px; }
+  .notif-bell .notif-badge {
+    position: absolute; top: -3px; right: -3px; min-width: 17px; height: 17px; padding: 0 4px;
+    border-radius: 999px; background: var(--danger); color: #fff; font-size: 10.5px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; font-family: var(--font-body);
+  }
+  .notif-list { display: flex; flex-direction: column; gap: 6px; max-height: 60vh; overflow-y: auto; }
+  .notif-group-title { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--text-muted); margin: 14px 0 4px 0; }
+  .notif-group-title:first-child { margin-top: 0; }
+  .notif-row {
+    display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); background: var(--surface); cursor: pointer; text-align: left; width: 100%;
+    font-family: var(--font-body);
+  }
+  .notif-row:hover { background: var(--surface-2); }
+  .notif-row.unread { border-color: var(--accent-2); background: var(--accent-soft); }
+  .notif-row .notif-dot { width: 8px; height: 8px; border-radius: 999px; margin-top: 5px; flex-shrink: 0; }
+  .notif-dot.overdue, .notif-dot.error { background: var(--danger); }
+  .notif-dot.pending { background: var(--pending); }
+  .notif-row-title { font-weight: 500; font-size: 13.5px; color: var(--text); }
+  .notif-row-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .notif-empty { color: var(--text-muted); font-size: 13.5px; padding: 20px 4px; text-align: center; }
 
   /* ---------- buttons ---------- */
   .btn {
@@ -983,13 +1030,14 @@
     z-index: 60;
   }
 </style>
+</head>
+<body>
 
 <script>
   (function () {
-    try {
-      var t = localStorage.getItem('ps_theme');
-      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
-    } catch (e) {}
+    // O sistema sempre abre no tema claro, mesmo se o SO estiver no escuro
+    // ou se uma sessão anterior tinha trocado para escuro manualmente.
+    try { document.documentElement.setAttribute('data-theme', 'light'); } catch (e) {}
   })();
 </script>
 
@@ -1026,18 +1074,21 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a1 1 0 0 1 1 1v1h1a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h1V5a1 1 0 0 1 1-1z"/><path d="M9 12h6M9 16h4"/></svg>
       <span class="rail-btn-label">Resumo</span>
     </button>
-    <button id="btn-theme" class="rail-btn ghost" type="button" title="Tema">
-      <svg id="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.5A9 9 0 1 1 11.5 3a7 7 0 0 0 9.5 9.5z"/></svg>
-      <svg id="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" hidden><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-      <span class="rail-btn-label" id="theme-label">Tema</span>
-    </button>
     <div class="rail-hint">Duplo clique para recolher</div>
   </nav>
 
   <div class="content">
     <header class="topbar">
-      <h1>P Studio <span class="topbar-tagline">· Creative Company</span></h1>
-      <p class="subtitle">Seu registro de entregas, com evidências, para conversar com confiança sobre o que você fez.</p>
+      <div class="topbar-row">
+        <div>
+          <h1>P Studio <span class="topbar-tagline">· Creative Company</span></h1>
+          <p class="subtitle">Seu registro de entregas, com evidências, para conversar com confiança sobre o que você fez.</p>
+        </div>
+        <button id="btn-notif-bell" class="notif-bell" type="button" title="Notificações" aria-label="Notificações">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span class="notif-badge" id="notif-badge" hidden>0</span>
+        </button>
+      </div>
     </header>
 
     <div id="status-banner" class="banner" hidden></div>
@@ -1140,6 +1191,14 @@
         </div>
         <button id="btn-save-profile" class="btn btn-primary" style="align-self:flex-start;" type="button">Salvar</button>
         <div class="data-section">
+          <p>O sistema sempre abre no tema claro. Se preferir, troque para o escuro só nesta sessão.</p>
+          <button id="btn-theme" class="btn btn-secondary btn-small" type="button">
+            <svg id="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:5px;"><path d="M21 12.5A9 9 0 1 1 11.5 3a7 7 0 0 0 9.5 9.5z"/></svg>
+            <svg id="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:5px;" hidden><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+            <span id="theme-label">Tema</span>
+          </button>
+        </div>
+        <div class="data-section">
           <p>Ative para receber um aviso do navegador quando um post for atribuído a você para aprovação (funciona enquanto esta aba estiver aberta).</p>
           <button id="btn-enable-notif" class="btn btn-secondary btn-small" type="button">Ativar notificações do navegador</button>
         </div>
@@ -1154,9 +1213,37 @@
           <span class="integration-dot" id="metricool-dot"></span>
           <strong id="metricool-title">Instagram via Metricool</strong>
         </div>
-        <p class="hint" id="metricool-desc">Conecte sua marca do Metricool para que posts aprovados no P Studio sejam agendados de verdade no Instagram.</p>
-        <button id="btn-connect-metricool" class="btn btn-secondary btn-small" style="align-self:flex-start;" type="button">Buscar marcas do Metricool</button>
-        <div class="integration-brand-list" id="metricool-brand-list"></div>
+        <p class="hint" id="metricool-desc">Agendamento automático ainda não está ligado nesta versão. Para funcionar, é preciso um token de API do Metricool (Configurações → API, no plano Advanced) — guarde aqui por enquanto; a chamada real será implementada depois de confirmar o formato oficial da API do Metricool.</p>
+        <div style="width:100%;">
+          <label for="metricool-token">User token da API</label>
+          <input id="metricool-token" placeholder="cole seu token do Metricool">
+        </div>
+        <div style="width:100%;">
+          <label for="metricool-blogid">Blog ID</label>
+          <input id="metricool-blogid" placeholder="ex: 7054483">
+        </div>
+        <button id="btn-save-metricool" class="btn btn-secondary btn-small" style="align-self:flex-start;" type="button">Salvar</button>
+      </div>
+
+      <div class="integration-card" style="margin-top:16px;">
+        <div class="integration-status-row">
+          <span class="integration-dot" id="supabase-dot"></span>
+          <strong>Banco de dados (Supabase)</strong>
+        </div>
+        <p class="hint" id="supabase-desc">Todos os dados do P Studio (tarefas, posts, perfil) ficam salvos no seu próprio projeto Supabase.</p>
+        <div style="width:100%;">
+          <label for="supabase-url">URL do projeto</label>
+          <input id="supabase-url" placeholder="https://xxxxx.supabase.co" value="https://iqueoolbondwqjpqiupf.supabase.co">
+        </div>
+        <div style="width:100%;">
+          <label for="supabase-key">Publishable key</label>
+          <input id="supabase-key" placeholder="sb_publishable_..." value="sb_publishable_QlAu59ziKU4e2I_q7X5CaQ_Z1dANd4w">
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button id="btn-save-supabase" class="btn btn-secondary btn-small" type="button">Salvar e reconectar</button>
+          <button id="btn-test-supabase" class="btn btn-primary btn-small" type="button">Testar conexão</button>
+        </div>
+        <p class="hint" id="supabase-status" style="margin-top:2px;"></p>
       </div>
     </div>
   </div>
@@ -1242,11 +1329,10 @@
             <option value="STORY">Story</option>
           </select>
         </div>
-        <p class="hint" id="post-integration-hint">Ao aprovar, o post é agendado de verdade no Instagram via Metricool (conecte em Perfil → Instagram/Metricool). O Instagram exige pelo menos uma imagem ou vídeo abaixo.</p>
+        <p class="hint" id="post-integration-hint">Agendamento automático no Instagram ainda não está ligado nesta versão standalone (depende da API própria do Metricool — veja Perfil). O Instagram exige pelo menos uma imagem ou vídeo abaixo.</p>
         <div>
-          <label>Mídia do post (imagem/vídeo)</label>
+          <label>Mídia do post (cole a URL pública da imagem/vídeo — ex: link do Google Drive com acesso "qualquer pessoa com o link")</label>
           <div class="media-grid" id="media-grid"></div>
-          <input type="file" id="media-file-input" accept="image/*,video/*" hidden>
         </div>
         <div id="metricool-status-line" class="hint" hidden></div>
       </div>
@@ -1339,6 +1425,21 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="notif-overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="notif-title">
+    <div class="modal-head">
+      <h2 id="notif-title">Notificações</h2>
+      <button class="icon-btn" id="notif-close" aria-label="Fechar">✕</button>
+    </div>
+    <div class="notif-list" id="notif-list"></div>
+    <div class="modal-actions">
+      <div class="modal-actions-right">
+        <button id="btn-notif-mark-all" class="btn btn-secondary btn-small" type="button">Marcar tudo como lido</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="toast" class="toast" hidden></div>
 
 <script>
@@ -1347,6 +1448,8 @@
 
   var STATUS = ['todo', 'doing', 'done'];
   var PRIORITY_LABEL = { P1: 'P1 · Alta', P2: 'P2 · Média', P3: 'P3 · Baixa' };
+  var DEFAULT_SUPABASE_URL = 'https://iqueoolbondwqjpqiupf.supabase.co';
+  var DEFAULT_SUPABASE_KEY = 'sb_publishable_QlAu59ziKU4e2I_q7X5CaQ_Z1dANd4w';
 
   var state = {
     tasks: [],
@@ -1363,7 +1466,8 @@
     firstSnapshot: true,
     assets: null,
     mcp: null,
-    metricool: null
+    metricool: null,
+    supabase: null
   };
 
   function $(sel, root) { return (root || document).querySelector(sel); }
@@ -1504,6 +1608,7 @@
 
   updateThemeUI();
   updateMetricoolUI();
+  updateSupabaseUI();
 
   /* ---------- sidebar (recolhe/expande com duplo clique) ---------- */
 
@@ -1512,11 +1617,8 @@
     railEl.classList.toggle('collapsed', collapsed);
     try { localStorage.setItem('ps_rail_collapsed', collapsed ? '1' : '0'); } catch (e) {}
   }
-  (function () {
-    try {
-      if (localStorage.getItem('ps_rail_collapsed') === '1') setRailCollapsed(true);
-    } catch (e) {}
-  })();
+  // O menu lateral sempre abre recolhido (double-click nele expande na hora).
+  setRailCollapsed(true);
   railEl.addEventListener('dblclick', function (e) {
     if (e.target.closest('button')) return;
     setRailCollapsed(!railEl.classList.contains('collapsed'));
@@ -1712,6 +1814,7 @@
     });
     renderDashboard();
     updatePostsBadge();
+    renderNotifications();
     if (state.view === 'posts') renderPosts();
   }
 
@@ -2053,25 +2156,16 @@
     addBtn.setAttribute('aria-label', 'Adicionar mídia');
     addBtn.textContent = '+';
     addBtn.addEventListener('click', function () {
-      if (!state.assets) { showToast('Conecte-se pelo link publicado do Claude para enviar mídia.'); return; }
-      $('#media-file-input').click();
+      var url = window.prompt('Cole a URL pública da imagem ou vídeo (ex: link do Google Drive com acesso "qualquer pessoa com o link pode ver"):');
+      if (!url) return;
+      url = url.trim();
+      if (!url) return;
+      var isVideo = /\.(mp4|mov|webm|m4v)(\?|#|$)/i.test(url);
+      mediaRows.push({ id: uid(), url: url, contentType: isVideo ? 'video/mp4' : 'image/jpeg' });
+      renderMediaGrid();
     });
     grid.appendChild(addBtn);
   }
-
-  $('#media-file-input').addEventListener('change', function () {
-    var file = this.files && this.files[0];
-    this.value = '';
-    if (!file || !state.assets) return;
-    showToast('Enviando mídia…');
-    state.assets.upload(file).then(function (res) {
-      mediaRows.push({ id: res.id, url: res.url, contentType: res.contentType });
-      renderMediaGrid();
-      showToast('Mídia adicionada.');
-    }).catch(function () {
-      showToast('Não foi possível enviar a mídia.');
-    });
-  });
 
   /* ---------- comentários ---------- */
 
@@ -2334,7 +2428,7 @@
     if (!t || !t.metricoolStatus || t.metricoolStatus === 'none') { line.hidden = true; return; }
     line.hidden = false;
     if (t.metricoolStatus === 'scheduled') {
-      line.textContent = '✓ Agendado no Instagram via Metricool.';
+      line.textContent = '✓ Agendado no Instagram via Metricool. A mídia foi removida daqui para economizar espaço — o Metricool já guardou a própria cópia dela.';
       line.style.color = 'var(--approved)';
     } else if (t.metricoolStatus === 'error') {
       line.textContent = '⚠ Falha ao agendar no Metricool: ' + (t.metricoolError || 'erro desconhecido');
@@ -2380,15 +2474,21 @@
       text: t.description || '',
       publicationDate: { dateTime: dateStr, timezone: tz }
     };
+    var mediaToClean = t.media.slice();
     return state.mcp.callTool('Metricool Social Media Management', 'createScheduledPost', {
       date: dateStr + offset,
       blogId: state.metricool.blogId,
       info: JSON.stringify(infoObj)
     }).then(function () {
-      Object.assign(t, { metricoolStatus: 'scheduled', metricoolError: '' });
-      saveTask(t.id, { metricoolStatus: 'scheduled', metricoolError: '' });
+      Object.assign(t, { metricoolStatus: 'scheduled', metricoolError: '', media: [] });
+      saveTask(t.id, { metricoolStatus: 'scheduled', metricoolError: '', media: [] });
       showToast('Agendado no Instagram via Metricool!');
-      if (state.editingId === t.id) updateMetricoolStatusLine(t);
+      if (state.editingId === t.id) { updateMetricoolStatusLine(t); mediaRows = []; renderMediaGrid(); }
+      if (state.assets) {
+        mediaToClean.forEach(function (m) {
+          state.assets.delete(m.id).catch(function () {});
+        });
+      }
     }).catch(function (err) {
       var msg = metricoolErrorMessage(err);
       Object.assign(t, { metricoolStatus: 'error', metricoolError: msg });
@@ -2472,6 +2572,36 @@
       cb.addEventListener('change', function () { state.postSelection[t.id] = cb.checked; renderPosts(); });
       row.appendChild(cb);
 
+      var thumb = document.createElement('div');
+      thumb.className = 'media-thumb';
+      thumb.style.flexShrink = '0';
+      if (t.media && t.media.length) {
+        if ((t.media[0].contentType || '').indexOf('video') === 0) {
+          var tv = document.createElement('video');
+          tv.src = t.media[0].url; tv.muted = true;
+          thumb.appendChild(tv);
+        } else {
+          var ti = document.createElement('img');
+          ti.src = t.media[0].url; ti.alt = '';
+          thumb.appendChild(ti);
+        }
+        if (t.media.length > 1) {
+          var count = document.createElement('span');
+          count.style.cssText = 'position:absolute;bottom:2px;right:2px;background:rgba(5,19,42,0.7);color:#fff;font-size:10px;border-radius:4px;padding:0 4px;';
+          count.textContent = '+' + (t.media.length - 1);
+          thumb.appendChild(count);
+        }
+      } else {
+        thumb.style.display = 'flex';
+        thumb.style.alignItems = 'center';
+        thumb.style.justifyContent = 'center';
+        thumb.style.color = 'var(--text-muted)';
+        thumb.style.fontSize = '9px';
+        thumb.title = t.metricoolStatus === 'scheduled' ? 'Mídia removida após o agendamento' : 'Sem mídia';
+        thumb.textContent = t.metricoolStatus === 'scheduled' ? '✓' : 'sem\nmídia';
+      }
+      row.appendChild(thumb);
+
       var main = document.createElement('div');
       main.className = 'post-row-main';
       var title = document.createElement('p');
@@ -2552,58 +2682,170 @@
     });
   });
 
-  /* ---------- integração metricool ---------- */
+  /* ---------- central de notificações ---------- */
+
+  function notifReadMap() {
+    try { return JSON.parse(localStorage.getItem('ps_notif_read') || '{}'); }
+    catch (e) { return {}; }
+  }
+  function saveNotifReadMap(map) {
+    try { localStorage.setItem('ps_notif_read', JSON.stringify(map)); } catch (e) {}
+  }
+  function markNotifRead(id) {
+    var map = notifReadMap();
+    map[id] = true;
+    saveNotifReadMap(map);
+  }
+
+  function buildNotifications() {
+    var list = [];
+    nonPostTasks().forEach(function (t) {
+      if (isOverdue(t)) {
+        list.push({
+          id: 'overdue:' + t.id, group: 'Atrasadas', dot: 'overdue',
+          title: t.title || '(sem título)', sub: 'Prazo era ' + fmtDateRange(t), taskId: t.id
+        });
+      }
+    });
+    postTasks().forEach(function (t) {
+      if ((t.approvalStatus || 'pending') === 'pending') {
+        list.push({
+          id: 'pending:' + t.id, group: 'Aguardando aprovação', dot: 'pending',
+          title: t.title || '(sem título)', sub: t.approver ? ('Aprovador: ' + t.approver) : 'Sem aprovador definido', taskId: t.id
+        });
+      }
+      if (t.metricoolStatus === 'error') {
+        list.push({
+          id: 'error:' + t.id, group: 'Erros de agendamento', dot: 'error',
+          title: t.title || '(sem título)', sub: t.metricoolError || 'Falha ao agendar no Metricool', taskId: t.id
+        });
+      }
+    });
+    return list;
+  }
+
+  function renderNotifications() {
+    var items = buildNotifications();
+    var readMap = notifReadMap();
+    var unread = items.filter(function (n) { return !readMap[n.id]; }).length;
+    var badge = $('#notif-badge');
+    if (badge) {
+      if (unread > 0) { badge.textContent = unread > 99 ? '99+' : String(unread); badge.hidden = false; }
+      else { badge.hidden = true; }
+    }
+
+    var list = $('#notif-list');
+    if (!list) return;
+    list.innerHTML = '';
+    if (!items.length) {
+      var empty = document.createElement('p');
+      empty.className = 'notif-empty';
+      empty.textContent = 'Nenhuma pendência no momento.';
+      list.appendChild(empty);
+      return;
+    }
+    var groups = {}, order = [];
+    items.forEach(function (n) {
+      if (!groups[n.group]) { groups[n.group] = []; order.push(n.group); }
+      groups[n.group].push(n);
+    });
+    order.forEach(function (g) {
+      var h = document.createElement('div');
+      h.className = 'notif-group-title';
+      h.textContent = g;
+      list.appendChild(h);
+      groups[g].forEach(function (n) {
+        var row = document.createElement('button');
+        row.type = 'button';
+        row.className = 'notif-row' + (readMap[n.id] ? '' : ' unread');
+        var dot = document.createElement('span'); dot.className = 'notif-dot ' + n.dot;
+        var textWrap = document.createElement('span'); textWrap.style.flex = '1';
+        var title = document.createElement('div'); title.className = 'notif-row-title'; title.textContent = n.title;
+        var sub = document.createElement('div'); sub.className = 'notif-row-sub'; sub.textContent = n.sub;
+        textWrap.appendChild(title); textWrap.appendChild(sub);
+        row.appendChild(dot); row.appendChild(textWrap);
+        row.addEventListener('click', function () {
+          markNotifRead(n.id);
+          $('#notif-overlay').hidden = true;
+          openTaskModal(n.taskId);
+          renderNotifications();
+        });
+        list.appendChild(row);
+      });
+    });
+  }
+
+  $('#btn-notif-bell').addEventListener('click', function () {
+    renderNotifications();
+    $('#notif-overlay').hidden = false;
+  });
+  $('#notif-close').addEventListener('click', function () { $('#notif-overlay').hidden = true; });
+  $('#notif-overlay').addEventListener('click', function (e) { if (e.target === $('#notif-overlay')) $('#notif-overlay').hidden = true; });
+  $('#btn-notif-mark-all').addEventListener('click', function () {
+    var map = notifReadMap();
+    buildNotifications().forEach(function (n) { map[n.id] = true; });
+    saveNotifReadMap(map);
+    renderNotifications();
+  });
+
+  /* ---------- integração metricool (token guardado só neste navegador) ---------- */
 
   function updateMetricoolUI() {
-    var connected = !!(state.metricool && state.metricool.blogId);
+    var connected = !!(state.metricool && state.metricool.apiToken && state.metricool.blogId);
     $('#metricool-dot').classList.toggle('on', connected);
     $('#metricool-desc').textContent = connected
-      ? ('Conectado a "' + (state.metricool.label || 'sua marca') + '". Posts do tipo Post aprovados com mídia e horário serão agendados de verdade no Instagram.')
-      : 'Conecte sua marca do Metricool para que posts aprovados no P Studio sejam agendados de verdade no Instagram.';
-    $('#btn-connect-metricool').textContent = connected ? 'Trocar marca do Metricool' : 'Buscar marcas do Metricool';
+      ? 'Token e Blog ID salvos neste navegador. O agendamento automático ainda depende de eu implementar a chamada real à API do Metricool — avise quando quiser que eu faça isso.'
+      : 'Agendamento automático ainda não está ligado nesta versão. Para funcionar, é preciso um token de API do Metricool (Configurações → API, no plano Advanced) — guarde aqui por enquanto; a chamada real será implementada depois de confirmar o formato oficial da API do Metricool.';
   }
 
-  function renderMetricoolBrandList(brands) {
-    var wrap = $('#metricool-brand-list');
-    wrap.innerHTML = '';
-    if (!brands.length) { wrap.innerHTML = '<p class="hint">Nenhuma marca encontrada na sua conta Metricool.</p>'; return; }
-    brands.forEach(function (b) {
-      var opt = document.createElement('div');
-      opt.className = 'integration-brand-option';
-      if (b.image) {
-        var img = document.createElement('img'); img.src = b.image; img.alt = '';
-        opt.appendChild(img);
-      }
-      var label = document.createElement('span');
-      var ig = b.networksData && b.networksData.instagramData;
-      label.textContent = b.label + (ig ? ' · @' + ig : '');
-      opt.appendChild(label);
-      opt.addEventListener('click', function () { saveMetricoolBrand(b); });
-      wrap.appendChild(opt);
-    });
-  }
-
-  function saveMetricoolBrand(b) {
-    var data = { blogId: String(b.id), label: b.label, timezone: b.timezone || 'America/Sao_Paulo' };
+  $('#btn-save-metricool').addEventListener('click', function () {
+    var apiToken = $('#metricool-token').value.trim();
+    var blogId = $('#metricool-blogid').value.trim();
+    var data = { apiToken: apiToken, blogId: blogId };
     state.metricool = data;
+    try { localStorage.setItem('ps_metricool', JSON.stringify(data)); } catch (e) {}
     updateMetricoolUI();
-    $('#metricool-brand-list').innerHTML = '';
-    if (state.db) {
-      state.db.collection('settings').doc('metricool').set(data).catch(function () {});
-    }
-    showToast('Metricool conectado: ' + b.label);
+    showToast('Dados do Metricool salvos neste navegador.');
+  });
+
+  /* ---------- integração supabase (fonte de dados real) ---------- */
+
+  function updateSupabaseUI() {
+    var connected = !!(state.db);
+    var dot = $('#supabase-dot');
+    if (dot) dot.classList.toggle('on', connected);
   }
 
-  $('#btn-connect-metricool').addEventListener('click', function () {
-    if (!state.mcp) { showToast('A conexão com o Metricool não está disponível nesta visualização (abra a página publicada pelo Claude).'); return; }
-    $('#metricool-brand-list').innerHTML = '<p class="hint">Buscando marcas…</p>';
-    state.mcp.callTool('Metricool Social Media Management', 'getBrandSettings', {}).then(function (res) {
-      var brands = (res.payload && res.payload.data) || [];
-      renderMetricoolBrandList(brands);
-    }).catch(function (err) {
-      $('#metricool-brand-list').innerHTML = '';
-      showToast(metricoolErrorMessage(err));
-    });
+  $('#btn-save-supabase').addEventListener('click', function () {
+    var url = $('#supabase-url').value.trim().replace(/\/+$/, '');
+    var key = $('#supabase-key').value.trim();
+    if (!url || !key) { showToast('Preencha a URL e a chave do Supabase.'); return; }
+    try { localStorage.setItem('ps_supabase_url', url); localStorage.setItem('ps_supabase_key', key); } catch (e) {}
+    state.supabase = { url: url, key: key };
+    connectSupabase(url, key);
+    showToast('Reconectando ao Supabase…');
+  });
+
+  $('#btn-test-supabase').addEventListener('click', function () {
+    var url = $('#supabase-url').value.trim().replace(/\/+$/, '');
+    var key = $('#supabase-key').value.trim();
+    var statusEl = $('#supabase-status');
+    if (!url || !key) { showToast('Preencha a URL e a chave do Supabase.'); return; }
+    statusEl.textContent = 'Testando conexão…';
+    fetch(url + '/rest/v1/tasks?select=id&limit=1', { headers: { apikey: key, Authorization: 'Bearer ' + key } })
+      .then(function (res) {
+        if (res.ok) {
+          statusEl.textContent = 'Conectado! A tabela "tasks" respondeu com status ' + res.status + '.';
+          showToast('Conectado ao Supabase.');
+        } else {
+          return res.text().then(function (body) {
+            statusEl.textContent = 'O Supabase respondeu com status ' + res.status + ' — confira a URL/chave, e se rodou o schema-supabase.sql. Detalhe: ' + body.slice(0, 200);
+          });
+        }
+      })
+      .catch(function (err) {
+        statusEl.textContent = 'Não foi possível conectar: ' + (err && err.message ? err.message : 'falha de rede.');
+      });
   });
 
   /* ---------- summary ---------- */
@@ -2682,20 +2924,21 @@
   });
 
   $('#btn-download-summary').addEventListener('click', function () {
-    if (!state.downloads) return;
     var text = $('#summary-text').textContent;
-    state.downloads.save({ filename: 'resumo-entregas.txt', data: text })
-      .then(function () { showToast('Arquivo salvo.'); })
-      .catch(function (err) {
-        if (err && err.code === 'declined') return;
-        showToast('Não foi possível baixar o arquivo.');
-      });
+    var blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'resumo-entregas.txt';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    showToast('Arquivo baixado.');
   });
 
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
       if (!$('#modal-overlay').hidden) closeTaskModal();
       if (!$('#summary-overlay').hidden) $('#summary-overlay').hidden = true;
+      if (!$('#notif-overlay').hidden) $('#notif-overlay').hidden = true;
     }
   });
 
@@ -2726,55 +2969,136 @@
     }
   }
 
-  function boot() {
-    renderBoard();
+  /* ---------- camada de dados: Supabase (substitui o db capability do Claude) ---------- */
 
-    if (!window.claude || !window.claude.use) {
+  var TASK_FIELD_MAP = {
+    dateEnd: 'date_end', timeSpent: 'time_spent', timerStartedAt: 'timer_started_at',
+    includeInReport: 'include_in_report', approvalStatus: 'approval_status',
+    scheduledAt: 'scheduled_at', igType: 'ig_type', metricoolStatus: 'metricool_status',
+    metricoolError: 'metricool_error', createdAt: 'created_at', updatedAt: 'updated_at',
+    isExample: 'is_example'
+  };
+  var TASK_FIELD_MAP_REV = {};
+  Object.keys(TASK_FIELD_MAP).forEach(function (k) { TASK_FIELD_MAP_REV[TASK_FIELD_MAP[k]] = k; });
+
+  function taskToRow(data) {
+    var row = {};
+    Object.keys(data).forEach(function (k) { row[TASK_FIELD_MAP[k] || k] = data[k]; });
+    return row;
+  }
+  function rowToTask(row) {
+    var t = {};
+    Object.keys(row).forEach(function (k) { t[TASK_FIELD_MAP_REV[k] || k] = row[k]; });
+    return t;
+  }
+  function sbErr(res) { if (res && res.error) throw res.error; return res; }
+
+  function makeSupabaseDb(client) {
+    var tasksChannel = null;
+    return {
+      collection: function (name) {
+        return {
+          doc: function (id) {
+            return {
+              get: function () {
+                if (name === 'settings') {
+                  return client.from('settings').select('value').eq('key', id).maybeSingle().then(function (res) {
+                    sbErr(res);
+                    return { exists: !!res.data, data: function () { return (res.data && res.data.value) || {}; } };
+                  });
+                }
+                return client.from('tasks').select('*').eq('id', id).maybeSingle().then(function (res) {
+                  sbErr(res);
+                  return { exists: !!res.data, data: function () { return res.data ? rowToTask(res.data) : null; } };
+                });
+              },
+              set: function (data) {
+                if (name === 'settings') return client.from('settings').upsert({ key: id, value: data }).then(sbErr);
+                var row = taskToRow(data); row.id = id;
+                return client.from('tasks').upsert(row).then(sbErr);
+              },
+              update: function (data) {
+                if (name === 'settings') return client.from('settings').update({ value: data }).eq('key', id).then(sbErr);
+                return client.from('tasks').update(taskToRow(data)).eq('id', id).then(sbErr);
+              },
+              delete: function () {
+                return client.from(name).delete().eq(name === 'settings' ? 'key' : 'id', id).then(sbErr);
+              }
+            };
+          },
+          add: function (data) {
+            var row = taskToRow(data);
+            row.id = uid() + uid();
+            return client.from('tasks').insert(row).then(function (res) { sbErr(res); return { id: row.id }; });
+          },
+          onSnapshot: function (cb, errCb) {
+            function load() {
+              client.from('tasks').select('*').order('created_at', { ascending: true }).then(function (res) {
+                if (res.error) { errCb && errCb(res.error); return; }
+                cb({ docs: res.data.map(function (row) { var t = rowToTask(row); return { id: t.id, data: function () { return t; } }; }) });
+              });
+            }
+            load();
+            if (tasksChannel) client.removeChannel(tasksChannel);
+            tasksChannel = client.channel('tasks-realtime')
+              .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, load)
+              .subscribe();
+          }
+        };
+      }
+    };
+  }
+
+  function connectSupabase(url, key) {
+    if (!url || !key) {
       state.loaded = true;
       renderBoard();
-      showBanner('Esta página está sendo vista fora do Claude — o que você adicionar agora fica só nesta sessão do navegador, sem salvar.');
+      showBanner('Configure a URL e a chave do seu projeto Supabase em Perfil para salvar de verdade.');
       return;
     }
-
-    window.claude.use('db').then(function (db) {
-      if (!db) {
-        state.loaded = true;
-        renderBoard();
-        showBanner('Este registro está sem conexão com o armazenamento agora — o que você adicionar fica só nesta sessão. Abra a página publicada pelo Claude para ativar o salvamento.');
-        return;
-      }
-      state.db = db;
-      db.collection('tasks').onSnapshot(bootFromSnapshot, function (err) {
-        showBanner('Não foi possível sincronizar os dados (' + ((err && err.code) || 'erro') + '). Suas alterações podem não ser salvas.');
-      });
-      db.collection('settings').doc('profile').get().then(function (snap) {
-        if (snap.exists) applyProfile(snap.data());
-      }).catch(function () {});
-      db.collection('settings').doc('metricool').get().then(function (snap) {
-        if (snap.exists) { state.metricool = snap.data(); updateMetricoolUI(); }
-      }).catch(function () {});
-    }).catch(function () {
+    if (typeof window.supabase === 'undefined') {
       state.loaded = true;
       renderBoard();
-      showBanner('Não foi possível conectar ao armazenamento.');
+      showBanner('Não foi possível carregar a biblioteca do Supabase (verifique sua conexão com a internet e recarregue a página).');
+      return;
+    }
+    var client = window.supabase.createClient(url, key);
+    state.db = makeSupabaseDb(client);
+    state.db.collection('tasks').onSnapshot(bootFromSnapshot, function (err) {
+      showBanner('Não foi possível sincronizar os dados (' + errMsg(err) + '). Confira a URL/chave do Supabase em Perfil.');
     });
+    state.db.collection('settings').doc('profile').get().then(function (snap) {
+      if (snap.exists) applyProfile(snap.data());
+    }).catch(function () {});
+  }
 
-    window.claude.use('downloads').then(function (downloads) {
-      if (downloads) {
-        state.downloads = downloads;
-        $('#btn-download-summary').hidden = false;
+  function boot() {
+    renderBoard();
+    var savedUrl, savedKey;
+    try {
+      savedUrl = localStorage.getItem('ps_supabase_url') || DEFAULT_SUPABASE_URL;
+      savedKey = localStorage.getItem('ps_supabase_key') || DEFAULT_SUPABASE_KEY;
+    } catch (e) { savedUrl = DEFAULT_SUPABASE_URL; savedKey = DEFAULT_SUPABASE_KEY; }
+    state.supabase = { url: savedUrl, key: savedKey };
+    if ($('#supabase-url')) $('#supabase-url').value = savedUrl;
+    if ($('#supabase-key')) $('#supabase-key').value = savedKey;
+    connectSupabase(savedUrl, savedKey);
+
+    try {
+      var mt = JSON.parse(localStorage.getItem('ps_metricool') || 'null');
+      if (mt) {
+        state.metricool = mt;
+        if ($('#metricool-token')) $('#metricool-token').value = mt.apiToken || '';
+        if ($('#metricool-blogid')) $('#metricool-blogid').value = mt.blogId || '';
+        updateMetricoolUI();
       }
-    }).catch(function () {});
+    } catch (e) {}
 
-    window.claude.use('assets').then(function (assets) {
-      if (assets) state.assets = assets;
-    }).catch(function () {});
-
-    window.claude.use('mcp').then(function (mcp) {
-      if (mcp) state.mcp = mcp;
-    }).catch(function () {});
+    $('#btn-download-summary').hidden = false;
   }
 
   boot();
 })();
 </script>
+</body>
+</html>
