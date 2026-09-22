@@ -138,31 +138,31 @@
     }
   }
 
-  /* ---------- shell / rail (sidebar lateral) ---------- */
+  /* ---------- shell / rail (sidebar lateral, sempre fixa, nunca flutuando) ---------- */
   .shell {
     display: flex;
-    align-items: flex-start;
-    max-width: 1280px;
-    margin: 0 auto;
+    align-items: stretch;
+    width: 100%;
+    margin: 0;
   }
   .rail {
     flex-shrink: 0;
     width: 220px;
     background: linear-gradient(175deg, var(--rail-glass-1), var(--rail-glass-2));
-    -webkit-backdrop-filter: blur(22px) saturate(160%);
-    backdrop-filter: blur(22px) saturate(160%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 12px 32px rgba(5, 19, 42, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    border-radius: var(--radius);
-    margin: 20px 0 20px 12px;
+    border: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.04);
+    border-radius: 0;
+    margin: 0;
     padding: 16px 12px;
     display: flex;
     flex-direction: column;
     align-items: stretch;
     gap: 3px;
     position: sticky;
-    top: 20px;
-    max-height: calc(100vh - 40px);
+    top: 0;
+    height: 100vh;
+    max-height: 100vh;
     overflow-y: auto;
     transition: width 0.18s ease;
     user-select: none;
@@ -282,19 +282,22 @@
     .rail {
       width: auto !important;
       max-width: none;
+      height: auto;
       margin: 0;
       padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px)) 6px;
       position: fixed;
-      left: 8px;
-      right: 8px;
-      bottom: 8px;
+      left: 0;
+      right: 0;
+      bottom: 0;
       top: auto;
       max-height: none;
       flex-direction: row;
       align-items: center;
       gap: 2px;
       z-index: 40;
-      border-radius: 18px;
+      border-radius: 0;
+      border-right: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
       overflow-x: auto;
       overflow-y: visible;
     }
@@ -456,6 +459,8 @@
   }
 
   /* ---------- board (estilo Trello) ---------- */
+  .board-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .board-toolbar-spacer { flex: 1; }
   .board-frame {
     background: var(--board-bg);
     border-radius: var(--radius-lg);
@@ -495,7 +500,12 @@
     font-size: 13.5px;
     letter-spacing: 0.01em;
     color: var(--text);
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
+  .column-title:hover { color: var(--accent); }
   .column-count {
     margin-left: auto;
     font-family: var(--font-mono);
@@ -504,7 +514,32 @@
     background: var(--surface);
     border-radius: 999px;
     padding: 1px 8px;
+    flex-shrink: 0;
   }
+  .column-del-btn {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    line-height: 1;
+  }
+  .column-del-btn:hover { background: rgba(224,103,75,0.14); color: var(--danger); }
+  .column.column-add {
+    background: transparent;
+    border: 1.5px dashed rgba(255,255,255,0.18);
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 14px;
+  }
+  .column.column-add .btn { width: 100%; }
   .column-body {
     display: flex;
     flex-direction: column;
@@ -1331,24 +1366,16 @@
         <label class="checkbox-inline"><input type="checkbox" id="filter-report-only"> Só marcados p/ relatório</label>
       </section>
 
+      <div class="board-toolbar">
+        <div class="pill-tabs" id="board-tabs"></div>
+        <button id="btn-new-board" class="btn btn-ghost btn-small" type="button" title="Novo quadro">+ Quadro</button>
+        <div class="board-toolbar-spacer"></div>
+        <button id="btn-rename-board" class="btn btn-ghost btn-small" type="button">Renomear quadro</button>
+        <button id="btn-delete-board" class="btn btn-ghost btn-small" type="button">Excluir quadro</button>
+      </div>
+
       <div class="board-frame">
-        <main class="board" id="board">
-          <div class="column" data-status="todo">
-            <div class="column-head"><span class="status-dot todo"></span><span class="column-title">A Fazer</span><span class="column-count" id="count-todo">0</span></div>
-            <div class="column-body" id="list-todo"></div>
-            <div class="quick-add" data-status="todo"></div>
-          </div>
-          <div class="column" data-status="doing">
-            <div class="column-head"><span class="status-dot doing"></span><span class="column-title">Em Andamento</span><span class="column-count" id="count-doing">0</span></div>
-            <div class="column-body" id="list-doing"></div>
-            <div class="quick-add" data-status="doing"></div>
-          </div>
-          <div class="column" data-status="done">
-            <div class="column-head"><span class="status-dot done"></span><span class="column-title">Concluído</span><span class="column-count" id="count-done">0</span></div>
-            <div class="column-body" id="list-done"></div>
-            <div class="quick-add" data-status="done"></div>
-          </div>
-        </main>
+        <main class="board" id="board"></main>
       </div>
     </div>
 
@@ -1482,15 +1509,17 @@
         <label for="f-title">Título</label>
         <input id="f-title" required>
       </div>
-      <div class="field-row">
+      <div class="field-row" id="board-column-row">
         <div>
-          <label for="f-status">Status</label>
-          <select id="f-status">
-            <option value="todo">A Fazer</option>
-            <option value="doing">Em Andamento</option>
-            <option value="done">Concluído</option>
-          </select>
+          <label for="f-board">Quadro</label>
+          <select id="f-board"></select>
         </div>
+        <div>
+          <label for="f-column">Coluna</label>
+          <select id="f-column"></select>
+        </div>
+      </div>
+      <div class="field-row">
         <div>
           <label for="f-priority">Prioridade</label>
           <select id="f-priority">
@@ -1499,16 +1528,17 @@
             <option value="P3">P3 · Baixa</option>
           </select>
         </div>
-      </div>
-      <div class="field-row">
         <div>
           <label for="f-date">Início</label>
           <input type="date" id="f-date">
         </div>
+      </div>
+      <div class="field-row">
         <div>
           <label for="f-date-end">Prazo final (opcional)</label>
           <input type="date" id="f-date-end">
         </div>
+        <div></div>
       </div>
       <div class="field-row">
         <div>
@@ -1661,7 +1691,6 @@
 (function () {
   'use strict';
 
-  var STATUS = ['todo', 'doing', 'done'];
   var PRIORITY_LABEL = { P1: 'P1 · Alta', P2: 'P2 · Média', P3: 'P3 · Baixa' };
   var DEFAULT_SUPABASE_URL = 'https://iqueoolbondwqjpqiupf.supabase.co';
   var DEFAULT_SUPABASE_KEY = 'sb_publishable_QlAu59ziKU4e2I_q7X5CaQ_Z1dANd4w';
@@ -1679,7 +1708,10 @@
     postFilter: 'pending',
     postSelection: {},
     firstSnapshot: true,
-    supabase: null
+    supabase: null,
+    boards: [],
+    columns: [],
+    currentBoardId: null
   };
 
   function $(sel, root) { return (root || document).querySelector(sel); }
@@ -2005,34 +2037,143 @@
     return true;
   }
 
+  /* ---------- quadros (vários, estilo Trello) ---------- */
+
+  function currentBoardColumns() {
+    return state.columns
+      .filter(function (c) { return c.board_id === state.currentBoardId; })
+      .sort(function (a, b) { return (a.position - b.position) || String(a.id).localeCompare(String(b.id)); });
+  }
+  function columnKind(col, cols) {
+    var idx = cols.findIndex(function (c) { return c.id === col.id; });
+    if (idx <= 0) return 'todo';
+    if (idx === cols.length - 1) return 'done';
+    return 'doing';
+  }
+
+  function renderBoardTabs() {
+    var wrap = $('#board-tabs');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    state.boards.forEach(function (b) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'pill-tab' + (b.id === state.currentBoardId ? ' active' : '');
+      btn.textContent = b.name;
+      btn.addEventListener('click', function () {
+        state.currentBoardId = b.id;
+        try { localStorage.setItem('ps_current_board', b.id); } catch (e) {}
+        renderBoardTabs();
+        renderBoard();
+      });
+      wrap.appendChild(btn);
+    });
+  }
+
   function renderBoard() {
     renderCategoryOptions();
-    STATUS.forEach(function (status) {
-      var list = $('#list-' + status);
-      list.innerHTML = '';
+    renderBoardTabs();
+    var boardEl = $('#board');
+    boardEl.innerHTML = '';
 
-      if (!state.loaded) {
-        var loading = document.createElement('p');
-        loading.className = 'empty-hint';
-        loading.textContent = 'Carregando…';
-        list.appendChild(loading);
-        $('#count-' + status).textContent = '';
-        return;
-      }
+    if (!state.loaded) {
+      var loading = document.createElement('p');
+      loading.className = 'empty-hint';
+      loading.textContent = 'Carregando…';
+      boardEl.appendChild(loading);
+      renderDashboard(); updatePostsBadge(); renderNotifications();
+      if (state.view === 'posts') renderPosts();
+      return;
+    }
 
-      var items = state.tasks.filter(function (t) { return t.status === status && taskType(t) !== 'post'; }).filter(matchesFilters);
+    var cols = currentBoardColumns();
+
+    if (!cols.length) {
+      var emptyBoard = document.createElement('p');
+      emptyBoard.className = 'empty-hint';
+      emptyBoard.textContent = state.currentBoardId ? 'Este quadro ainda não tem colunas — adicione uma abaixo.' : 'Crie um quadro para começar.';
+      boardEl.appendChild(emptyBoard);
+    }
+
+    cols.forEach(function (col) {
+      var kind = columnKind(col, cols);
+
+      var colEl = document.createElement('div');
+      colEl.className = 'column';
+      colEl.dataset.columnId = col.id;
+
+      var head = document.createElement('div');
+      head.className = 'column-head';
+      var dot = document.createElement('span');
+      dot.className = 'status-dot ' + kind;
+      head.appendChild(dot);
+
+      var titleEl = document.createElement('span');
+      titleEl.className = 'column-title';
+      titleEl.textContent = col.name;
+      titleEl.title = 'Clique para renomear';
+      titleEl.addEventListener('click', function () {
+        var name = window.prompt('Novo nome da coluna:', col.name);
+        if (name && name.trim()) renameColumn(col.id, name.trim());
+      });
+      head.appendChild(titleEl);
+
+      var countEl = document.createElement('span');
+      countEl.className = 'column-count';
+      head.appendChild(countEl);
+
+      var delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'column-del-btn';
+      delBtn.title = 'Excluir coluna';
+      delBtn.textContent = '✕';
+      delBtn.addEventListener('click', function () {
+        if (window.confirm('Excluir a coluna "' + col.name + '"? Os cards dela vão para a primeira coluna do quadro.')) deleteColumn(col.id);
+      });
+      head.appendChild(delBtn);
+      colEl.appendChild(head);
+
+      var body = document.createElement('div');
+      body.className = 'column-body';
+      body.id = 'list-' + col.id;
+      colEl.appendChild(body);
+
+      var quickAdd = document.createElement('div');
+      quickAdd.className = 'quick-add';
+      colEl.appendChild(quickAdd);
+
+      boardEl.appendChild(colEl);
+
+      var items = state.tasks.filter(function (t) { return t.columnId === col.id && taskType(t) !== 'post'; }).filter(matchesFilters);
       items.sort(function (a, b) { return (a.date || '').localeCompare(b.date || ''); });
-      $('#count-' + status).textContent = items.length;
-
-      if (items.length === 0) {
+      countEl.textContent = items.length;
+      if (!items.length) {
         var p = document.createElement('p');
         p.className = 'empty-hint';
         p.textContent = 'Nada por aqui ainda.';
-        list.appendChild(p);
-        return;
+        body.appendChild(p);
+      } else {
+        items.forEach(function (t) { body.appendChild(buildCard(t)); });
       }
-      items.forEach(function (t) { list.appendChild(buildCard(t)); });
+
+      renderQuickAddButton(quickAdd, col.id);
+      wireColumnDragDrop(body, col.id);
     });
+
+    var addColEl = document.createElement('div');
+    addColEl.className = 'column column-add';
+    var addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'btn btn-ghost';
+    addBtn.textContent = '+ Adicionar coluna';
+    addBtn.addEventListener('click', function () {
+      if (!state.currentBoardId) { showToast('Crie um quadro primeiro.'); return; }
+      var name = window.prompt('Nome da nova coluna:');
+      if (name && name.trim()) createColumn(state.currentBoardId, name.trim());
+    });
+    addColEl.appendChild(addBtn);
+    boardEl.appendChild(addColEl);
+
     renderDashboard();
     updatePostsBadge();
     renderNotifications();
@@ -2171,17 +2312,17 @@
 
   /* ---------- adicionar cartão rápido (estilo Trello) ---------- */
 
-  function renderQuickAddButton(container, status) {
+  function renderQuickAddButton(container, columnId) {
     container.innerHTML = '';
     var btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'quick-add-btn';
     btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Adicionar cartão';
-    btn.addEventListener('click', function () { renderQuickAddForm(container, status); });
+    btn.addEventListener('click', function () { renderQuickAddForm(container, columnId); });
     container.appendChild(btn);
   }
 
-  function renderQuickAddForm(container, status) {
+  function renderQuickAddForm(container, columnId) {
     container.innerHTML = '';
     var form = document.createElement('div');
     form.className = 'quick-add-form';
@@ -2201,10 +2342,14 @@
 
     function submit() {
       var title = ta.value.trim();
-      if (!title) { renderQuickAddButton(container, status); return; }
+      if (!title) { renderQuickAddButton(container, columnId); return; }
+      var cols = currentBoardColumns();
+      var col = cols.find(function (c) { return c.id === columnId; });
       saveTask(null, {
         title: title,
-        status: status,
+        boardId: state.currentBoardId,
+        columnId: columnId,
+        status: col ? columnKind(col, cols) : 'todo',
         priority: 'P2',
         category: '',
         assignee: state.profile.name || 'Eu',
@@ -2215,20 +2360,15 @@
         links: [],
         updatedAt: new Date().toISOString()
       });
-      renderQuickAddForm(container, status);
+      renderQuickAddForm(container, columnId);
     }
     addBtn.addEventListener('click', submit);
-    cancelBtn.addEventListener('click', function () { renderQuickAddButton(container, status); });
+    cancelBtn.addEventListener('click', function () { renderQuickAddButton(container, columnId); });
     ta.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); }
-      if (e.key === 'Escape') { e.preventDefault(); renderQuickAddButton(container, status); }
+      if (e.key === 'Escape') { e.preventDefault(); renderQuickAddButton(container, columnId); }
     });
   }
-
-  STATUS.forEach(function (status) {
-    var container = $('.quick-add[data-status="' + status + '"]');
-    if (container) renderQuickAddButton(container, status);
-  });
 
   /* ---------- task modal ---------- */
 
@@ -2241,12 +2381,52 @@
       b.classList.toggle('active', b.dataset.type === type);
     });
     $('#post-fields').hidden = type !== 'post';
+    $('#board-column-row').hidden = type === 'post';
     $('#f-desc-label').textContent = type === 'post' ? 'Legenda / conteúdo do post' : 'Descrição';
     $('#f-desc').placeholder = type === 'post' ? 'O texto/legenda que vai junto com o post' : 'O que foi feito, e o impacto disso';
   }
 
   $all('#type-toggle button').forEach(function (b) {
     b.addEventListener('click', function () { setModalType(b.dataset.type); });
+  });
+
+  function populateFormColumns(boardId, selectedColumnId) {
+    var sel = $('#f-column');
+    sel.innerHTML = '';
+    var cols = state.columns
+      .filter(function (c) { return c.board_id === boardId; })
+      .sort(function (a, b) { return a.position - b.position; });
+    cols.forEach(function (c) {
+      var opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = c.name;
+      sel.appendChild(opt);
+    });
+    if (selectedColumnId && cols.some(function (c) { return c.id === selectedColumnId; })) {
+      sel.value = selectedColumnId;
+    } else if (cols.length) {
+      sel.value = cols[0].id;
+    }
+  }
+
+  function populateFormBoards(selectedBoardId, selectedColumnId) {
+    var sel = $('#f-board');
+    sel.innerHTML = '';
+    state.boards.forEach(function (b) {
+      var opt = document.createElement('option');
+      opt.value = b.id;
+      opt.textContent = b.name;
+      sel.appendChild(opt);
+    });
+    var boardId = (selectedBoardId && state.boards.some(function (b) { return b.id === selectedBoardId; }))
+      ? selectedBoardId
+      : (state.boards[0] && state.boards[0].id);
+    sel.value = boardId || '';
+    populateFormColumns(boardId, selectedColumnId);
+  }
+
+  $('#f-board').addEventListener('change', function () {
+    populateFormColumns(this.value, null);
   });
 
   function openTaskModal(id, presetType) {
@@ -2256,7 +2436,7 @@
     setModalType(type);
     $('#modal-title').textContent = t ? (type === 'post' ? 'Editar post' : 'Editar entrada') : (type === 'post' ? 'Novo post' : 'Nova entrada');
     $('#f-title').value = t ? (t.title || '') : '';
-    $('#f-status').value = t ? t.status : 'todo';
+    populateFormBoards(t ? t.boardId : state.currentBoardId, t ? t.columnId : null);
     $('#f-priority').value = t ? (t.priority || 'P2') : 'P2';
     $('#f-category').value = t ? (t.category || '') : '';
     $('#f-assignee').value = t ? (t.assignee || '') : (state.profile.name || 'Eu');
@@ -2522,7 +2702,6 @@
     var data = {
       type: state.currentType,
       title: title,
-      status: $('#f-status').value,
       priority: $('#f-priority').value,
       category: $('#f-category').value.trim(),
       assignee: $('#f-assignee').value.trim() || 'Eu',
@@ -2545,6 +2724,14 @@
       data.approvalStatus = existing ? (existing.approvalStatus || 'pending') : 'pending';
       data.media = mediaRows.map(function (m) { return { id: m.id, url: m.url, contentType: m.contentType }; });
       data.igType = $('#f-ig-type').value;
+    } else {
+      var boardId = $('#f-board').value || null;
+      var columnId = $('#f-column').value || null;
+      var cols = state.columns.filter(function (c) { return c.board_id === boardId; }).sort(function (a, b) { return a.position - b.position; });
+      var col = cols.find(function (c) { return c.id === columnId; });
+      data.boardId = boardId;
+      data.columnId = columnId;
+      data.status = col ? columnKind(col, cols) : (existing ? existing.status : 'todo');
     }
     saveTask(state.editingId, data);
     closeTaskModal();
@@ -2610,8 +2797,7 @@
 
   /* ---------- drag & drop (quadro estilo Trello) ---------- */
 
-  STATUS.forEach(function (status) {
-    var list = $('#list-' + status);
+  function wireColumnDragDrop(list, columnId) {
     list.addEventListener('dragover', function (e) { e.preventDefault(); list.classList.add('drag-over'); });
     list.addEventListener('dragleave', function () { list.classList.remove('drag-over'); });
     list.addEventListener('drop', function (e) {
@@ -2620,10 +2806,17 @@
       var id = e.dataTransfer.getData('text/plain');
       if (!id) return;
       var t = state.tasks.find(function (x) { return x.id === id; });
-      if (!t || t.status === status) return;
-      saveTask(id, { status: status, updatedAt: new Date().toISOString() });
+      if (!t || t.columnId === columnId) return;
+      var cols = currentBoardColumns();
+      var col = cols.find(function (c) { return c.id === columnId; });
+      saveTask(id, {
+        boardId: state.currentBoardId,
+        columnId: columnId,
+        status: col ? columnKind(col, cols) : t.status,
+        updatedAt: new Date().toISOString()
+      });
     });
-  });
+  }
 
   /* ---------- aprovação de posts ---------- */
 
@@ -3177,7 +3370,7 @@
     scheduledAt: 'scheduled_at', igType: 'ig_type', publishStatus: 'publish_status',
     publishError: 'publish_error', publishedAt: 'published_at', igMediaId: 'ig_media_id',
     igPermalink: 'ig_permalink', createdAt: 'created_at', updatedAt: 'updated_at',
-    isExample: 'is_example'
+    isExample: 'is_example', boardId: 'board_id', columnId: 'column_id'
   };
   var TASK_FIELD_MAP_REV = {};
   Object.keys(TASK_FIELD_MAP).forEach(function (k) { TASK_FIELD_MAP_REV[TASK_FIELD_MAP[k]] = k; });
@@ -3318,9 +3511,138 @@
     typewriteQuote();
   }
 
+  /* ---------- quadros e colunas (tabelas próprias no Supabase) ---------- */
+
+  var boardsChannel = null;
+  var columnsChannel = null;
+
+  function ensureCurrentBoard() {
+    var saved = null;
+    try { saved = localStorage.getItem('ps_current_board'); } catch (e) {}
+    var valid = state.boards.some(function (b) { return b.id === saved; });
+    if (valid) { state.currentBoardId = saved; return; }
+    if (!state.boards.some(function (b) { return b.id === state.currentBoardId; })) {
+      state.currentBoardId = state.boards.length ? state.boards[0].id : null;
+    }
+  }
+
+  function loadBoardsAndColumns(client) {
+    function loadBoards() {
+      client.from('boards').select('*').order('position', { ascending: true }).then(function (res) {
+        if (res.error) { showToast('Não foi possível carregar os quadros: ' + errMsg(res.error)); return; }
+        state.boards = res.data || [];
+        ensureCurrentBoard();
+        renderBoard();
+      });
+    }
+    function loadColumns() {
+      client.from('board_columns').select('*').order('position', { ascending: true }).then(function (res) {
+        if (res.error) return;
+        state.columns = res.data || [];
+        renderBoard();
+      });
+    }
+    loadBoards();
+    loadColumns();
+    if (boardsChannel) client.removeChannel(boardsChannel);
+    boardsChannel = client.channel('boards-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'boards' }, loadBoards)
+      .subscribe();
+    if (columnsChannel) client.removeChannel(columnsChannel);
+    columnsChannel = client.channel('columns-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'board_columns' }, loadColumns)
+      .subscribe();
+  }
+
+  function createBoard(name) {
+    if (!authClient) return;
+    var id = 'board-' + uid();
+    var position = state.boards.length ? Math.max.apply(null, state.boards.map(function (b) { return b.position; })) + 1 : 0;
+    authClient.from('boards').insert({ id: id, name: name, position: position }).then(function (res) {
+      if (res.error) { showToast('Não foi possível criar o quadro: ' + errMsg(res.error)); return; }
+      return authClient.from('board_columns').insert({ id: 'col-' + uid(), board_id: id, name: 'A Fazer', position: 0 });
+    }).then(function () {
+      state.currentBoardId = id;
+      try { localStorage.setItem('ps_current_board', id); } catch (e) {}
+      showToast('Quadro criado.');
+    });
+  }
+
+  function renameBoard(id, name) {
+    if (!authClient) return;
+    authClient.from('boards').update({ name: name, updated_at: new Date().toISOString() }).eq('id', id).then(function (res) {
+      if (res.error) showToast('Não foi possível renomear: ' + errMsg(res.error));
+    });
+  }
+
+  function deleteBoard(id) {
+    if (!authClient) return;
+    authClient.from('boards').delete().eq('id', id).then(function (res) {
+      if (res.error) { showToast('Não foi possível excluir: ' + errMsg(res.error)); return; }
+      if (state.currentBoardId === id) {
+        state.currentBoardId = null;
+        try { localStorage.removeItem('ps_current_board'); } catch (e) {}
+      }
+      showToast('Quadro excluído.');
+    });
+  }
+
+  function createColumn(boardId, name) {
+    if (!authClient) return;
+    var colsInBoard = state.columns.filter(function (c) { return c.board_id === boardId; });
+    var position = colsInBoard.length ? Math.max.apply(null, colsInBoard.map(function (c) { return c.position; })) + 1 : 0;
+    authClient.from('board_columns').insert({ id: 'col-' + uid(), board_id: boardId, name: name, position: position }).then(function (res) {
+      if (res.error) showToast('Não foi possível criar a coluna: ' + errMsg(res.error));
+    });
+  }
+
+  function renameColumn(id, name) {
+    if (!authClient) return;
+    authClient.from('board_columns').update({ name: name, updated_at: new Date().toISOString() }).eq('id', id).then(function (res) {
+      if (res.error) showToast('Não foi possível renomear: ' + errMsg(res.error));
+    });
+  }
+
+  function deleteColumn(id) {
+    if (!authClient) return;
+    var col = state.columns.find(function (c) { return c.id === id; });
+    if (!col) return;
+    var siblings = state.columns
+      .filter(function (c) { return c.board_id === col.board_id && c.id !== id; })
+      .sort(function (a, b) { return a.position - b.position; });
+    if (!siblings.length) { showToast('O quadro precisa de pelo menos uma coluna.'); return; }
+    var target = siblings[0];
+    var targetKind = columnKind(target, siblings);
+    var affected = state.tasks.filter(function (t) { return t.columnId === id; });
+    Promise.all(affected.map(function (t) {
+      return authClient.from('tasks').update({ column_id: target.id, status: targetKind, updated_at: new Date().toISOString() }).eq('id', t.id);
+    })).then(function () {
+      return authClient.from('board_columns').delete().eq('id', id);
+    }).then(function (res) {
+      if (res && res.error) showToast('Não foi possível excluir a coluna: ' + errMsg(res.error));
+    });
+  }
+
+  $('#btn-new-board').addEventListener('click', function () {
+    var name = window.prompt('Nome do novo quadro:');
+    if (name && name.trim()) createBoard(name.trim());
+  });
+  $('#btn-rename-board').addEventListener('click', function () {
+    var b = state.boards.find(function (x) { return x.id === state.currentBoardId; });
+    if (!b) { showToast('Nenhum quadro selecionado.'); return; }
+    var name = window.prompt('Novo nome do quadro:', b.name);
+    if (name && name.trim()) renameBoard(b.id, name.trim());
+  });
+  $('#btn-delete-board').addEventListener('click', function () {
+    var b = state.boards.find(function (x) { return x.id === state.currentBoardId; });
+    if (!b) { showToast('Nenhum quadro selecionado.'); return; }
+    if (window.confirm('Excluir o quadro "' + b.name + '"? Os cards que estavam nele não são apagados, mas ficam sem quadro.')) deleteBoard(b.id);
+  });
+
   function loadUserData(client) {
     state.db = makeSupabaseDb(client);
     updateSupabaseUI();
+    loadBoardsAndColumns(client);
     state.db.collection('tasks').onSnapshot(bootFromSnapshot, function (err) {
       showBanner(friendlySyncError(err));
     });
@@ -3360,6 +3682,9 @@
       } else if (event === 'SIGNED_OUT') {
         state.db = null;
         state.tasks = [];
+        state.boards = [];
+        state.columns = [];
+        state.currentBoardId = null;
         updateSupabaseUI();
         showLogin();
       }
