@@ -964,7 +964,7 @@
   .status-chip.scheduled { background: var(--approved-soft); color: var(--approved); }
   .status-chip.ig-error { background: var(--rejected-soft); color: var(--rejected); }
 
-  /* ---------- mídia do post / integração metricool ---------- */
+  /* ---------- mídia do post / publicação no Instagram ---------- */
   .media-grid { display: flex; gap: 8px; flex-wrap: wrap; }
   .media-thumb {
     position: relative;
@@ -1424,25 +1424,13 @@
 
       <div class="integration-card">
         <div class="integration-status-row">
-          <span class="integration-dot" id="metricool-dot"></span>
-          <strong id="metricool-title">Instagram via Metricool</strong>
-          <span class="integration-status-badge" id="metricool-badge">Não conectado</span>
+          <span class="integration-dot" id="instagram-dot"></span>
+          <strong>Instagram</strong>
+          <span class="integration-status-badge" id="instagram-badge">Não verificado</span>
         </div>
-        <p class="hint" id="metricool-desc">Agendamento automático dos seus posts no Instagram. A conexão é privada e guardada só neste navegador — nada aparece visível na tela do dia a dia.</p>
-        <details class="integration-advanced">
-          <summary>Configurações avançadas</summary>
-          <div class="integration-advanced-body">
-            <div style="width:100%;">
-              <label for="metricool-token">User token da API</label>
-              <input id="metricool-token" type="password" autocomplete="off" placeholder="cole seu token do Metricool">
-            </div>
-            <div style="width:100%;">
-              <label for="metricool-blogid">Blog ID</label>
-              <input id="metricool-blogid" type="password" autocomplete="off" placeholder="ex: 7054483">
-            </div>
-            <button id="btn-save-metricool" class="btn btn-secondary btn-small" style="align-self:flex-start;" type="button">Salvar</button>
-          </div>
-        </details>
+        <p class="hint" id="instagram-desc">Publicação automática dos posts aprovados. A conexão com o Instagram é configurada diretamente no servidor — não fica exposta aqui.</p>
+        <button id="btn-test-instagram" class="btn btn-secondary btn-small" style="align-self:flex-start;" type="button">Testar conexão</button>
+        <p class="hint" id="instagram-status" style="margin-top:2px;"></p>
       </div>
 
       <div class="integration-card">
@@ -1556,12 +1544,12 @@
             <option value="STORY">Story</option>
           </select>
         </div>
-        <p class="hint" id="post-integration-hint">Agendamento automático no Instagram ainda não está ligado nesta versão standalone (depende da API própria do Metricool — veja Perfil). O Instagram exige pelo menos uma imagem ou vídeo abaixo.</p>
+        <p class="hint" id="post-integration-hint">Ao aprovar, o post é publicado automaticamente no Instagram no horário agendado (ou em poucos minutos, se não tiver horário). O Instagram exige pelo menos uma imagem ou vídeo abaixo.</p>
         <div>
-          <label>Mídia do post (cole a URL pública da imagem/vídeo — ex: link do Google Drive com acesso "qualquer pessoa com o link")</label>
+          <label>Mídia do post (cole a URL pública <strong>direta</strong> da imagem/vídeo — um link de visualização do Google Drive não funciona; use um link de download direto ou de um serviço como Supabase Storage)</label>
           <div class="media-grid" id="media-grid"></div>
         </div>
-        <div id="metricool-status-line" class="hint" hidden></div>
+        <div id="publish-status-line" class="hint" hidden></div>
       </div>
       <div>
         <label for="f-desc" id="f-desc-label">Descrição</label>
@@ -1691,9 +1679,6 @@
     postFilter: 'pending',
     postSelection: {},
     firstSnapshot: true,
-    assets: null,
-    mcp: null,
-    metricool: null,
     supabase: null
   };
 
@@ -1843,7 +1828,7 @@
   });
 
   updateThemeUI();
-  updateMetricoolUI();
+  updateInstagramUI();
   updateSupabaseUI();
 
   /* ---------- sidebar (recolhe/expande com duplo clique) ---------- */
@@ -2289,7 +2274,7 @@
     renderChecklist();
     mediaRows = (t && t.media) ? t.media.map(function (m) { return { id: m.id, url: m.url, contentType: m.contentType }; }) : [];
     renderMediaGrid();
-    updateMetricoolStatusLine(t);
+    updatePublishStatusLine(t);
 
     if (t) {
       $('#comments-section').hidden = false;
@@ -2658,105 +2643,62 @@
     });
   });
 
-  function updateMetricoolStatusLine(t) {
-    var line = $('#metricool-status-line');
+  function updatePublishStatusLine(t) {
+    var line = $('#publish-status-line');
     if (!line) return;
-    if (!t || !t.metricoolStatus || t.metricoolStatus === 'none') { line.hidden = true; return; }
+    if (!t || !t.publishStatus || t.publishStatus === 'none') { line.hidden = true; return; }
     line.hidden = false;
-    if (t.metricoolStatus === 'scheduled') {
-      line.textContent = '✓ Agendado no Instagram via Metricool. A mídia foi removida daqui para economizar espaço — o Metricool já guardou a própria cópia dela.';
+    line.textContent = '';
+    if (t.publishStatus === 'scheduled' || t.publishStatus === 'publishing') {
+      line.style.color = 'var(--text-muted)';
+      line.textContent = (t.scheduledAt && new Date(t.scheduledAt) > new Date())
+        ? ('🕒 Vai publicar automaticamente no Instagram em ' + fmtDateTime(t.scheduledAt) + '.')
+        : '🕒 Publicando no Instagram em instantes…';
+    } else if (t.publishStatus === 'published') {
       line.style.color = 'var(--approved)';
-    } else if (t.metricoolStatus === 'error') {
-      line.textContent = '⚠ Falha ao agendar no Metricool: ' + (t.metricoolError || 'erro desconhecido');
+      if (t.igPermalink) {
+        var a = document.createElement('a');
+        a.href = t.igPermalink; a.target = '_blank'; a.rel = 'noopener';
+        a.textContent = '✓ Publicado no Instagram — ver post';
+        line.appendChild(a);
+      } else {
+        line.textContent = '✓ Publicado no Instagram. A mídia foi removida daqui para economizar espaço.';
+      }
+    } else if (t.publishStatus === 'error') {
       line.style.color = 'var(--danger)';
+      line.textContent = '⚠ Falha ao publicar: ' + (t.publishError || 'erro desconhecido');
     } else {
       line.hidden = true;
     }
   }
 
-  function metricoolErrorMessage(err) {
-    var code = err && err.code;
-    switch (code) {
-      case 'needs_reauth':
-      case 'server_not_connected':
-        return 'Conecte/reconecte o Metricool em claude.ai → Configurações → Conectores.';
-      case 'consent_required':
-        return 'Autorize o Metricool quando o Claude perguntar, e tente de novo.';
-      case 'not_in_manifest':
-        return 'Esta página não tem permissão configurada para essa chamada ao Metricool.';
-      case 'blocked_by_policy':
-        return 'Sua organização bloqueou esse acesso ao Metricool.';
-      case 'selection_required':
-        return 'Escolha a conexão do Metricool quando o Claude perguntar, e tente de novo.';
-      case 'server_unavailable':
-        return 'Metricool indisponível agora — tente novamente em instantes.';
-      case 'tool_error':
-        return 'Metricool recusou a publicação: ' + (err.message || 'motivo não informado');
-      default:
-        return 'Não foi possível falar com o Metricool agora.';
-    }
-  }
-
-  function scheduleOnMetricool(t) {
-    var tz = (state.metricool && state.metricool.timezone) || 'America/Sao_Paulo';
-    var dateStr = t.scheduledAt.length === 16 ? (t.scheduledAt + ':00') : t.scheduledAt;
-    var offset = tzOffsetString(tz, new Date(t.scheduledAt));
-    var infoObj = {
-      autoPublish: true,
-      draft: false,
-      media: t.media.map(function (m) { return m.url; }),
-      providers: [{ network: 'instagram' }],
-      instagramData: { type: t.igType || 'POST' },
-      text: t.description || '',
-      publicationDate: { dateTime: dateStr, timezone: tz }
-    };
-    var mediaToClean = t.media.slice();
-    return state.mcp.callTool('Metricool Social Media Management', 'createScheduledPost', {
-      date: dateStr + offset,
-      blogId: state.metricool.blogId,
-      info: JSON.stringify(infoObj)
-    }).then(function () {
-      Object.assign(t, { metricoolStatus: 'scheduled', metricoolError: '', media: [] });
-      saveTask(t.id, { metricoolStatus: 'scheduled', metricoolError: '', media: [] });
-      showToast('Agendado no Instagram via Metricool!');
-      if (state.editingId === t.id) { updateMetricoolStatusLine(t); mediaRows = []; renderMediaGrid(); }
-      if (state.assets) {
-        mediaToClean.forEach(function (m) {
-          state.assets.delete(m.id).catch(function () {});
-        });
-      }
-    }).catch(function (err) {
-      var msg = metricoolErrorMessage(err);
-      Object.assign(t, { metricoolStatus: 'error', metricoolError: msg });
-      saveTask(t.id, { metricoolStatus: 'error', metricoolError: msg });
-      showToast('Aprovado, mas falhou o agendamento: ' + msg);
-      if (state.editingId === t.id) updateMetricoolStatusLine(t);
-    });
+  function triggerPublishSweep() {
+    if (!authClient) return;
+    authClient.functions.invoke('publish-instagram', { body: {} }).catch(function () {});
   }
 
   function approvePost(id) {
     var t = state.tasks.find(function (x) { return x.id === id; });
     if (!t) return Promise.resolve();
-    Object.assign(t, { approvalStatus: 'approved' });
-    saveTask(id, { approvalStatus: 'approved', updatedAt: new Date().toISOString() });
-
-    if (!state.mcp || !state.metricool || !state.metricool.blogId) {
-      showToast('Post aprovado. Conecte o Metricool em Perfil para agendar automaticamente no Instagram.');
-      return Promise.resolve();
-    }
     if (!t.media || !t.media.length) {
-      showToast('Post aprovado, mas não agendado: o Instagram exige imagem/vídeo. Adicione a mídia e aprove de novo.');
+      showToast('Não é possível aprovar: o Instagram exige uma imagem ou vídeo. Adicione a mídia e aprove de novo.');
       return Promise.resolve();
     }
-    if (!t.scheduledAt) {
-      showToast('Post aprovado, mas sem horário: defina "Agendar publicação" e aprove de novo.');
-      return Promise.resolve();
+    var fields = { approvalStatus: 'approved', publishStatus: 'scheduled', publishError: '', updatedAt: new Date().toISOString() };
+    Object.assign(t, fields);
+    saveTask(id, fields);
+    if (t.scheduledAt && new Date(t.scheduledAt) > new Date()) {
+      showToast('Post aprovado — será publicado automaticamente no Instagram em ' + fmtDateTime(t.scheduledAt) + '.');
+    } else {
+      showToast('Post aprovado — será publicado no Instagram em instantes.');
+      triggerPublishSweep();
     }
-    return scheduleOnMetricool(t);
+    if (state.editingId === t.id) updatePublishStatusLine(t);
+    return Promise.resolve();
   }
   function rejectPost(id) {
     saveTask(id, { approvalStatus: 'rejected', updatedAt: new Date().toISOString() });
-    showToast('Post rejeitado. Se ele já tinha sido agendado no Metricool, cancele por lá também — esta página não remove um agendamento já feito.');
+    showToast('Post rejeitado.');
   }
 
   $('#btn-bulk-approve').addEventListener('click', function () {
@@ -2833,8 +2775,8 @@
         thumb.style.justifyContent = 'center';
         thumb.style.color = 'var(--text-muted)';
         thumb.style.fontSize = '9px';
-        thumb.title = t.metricoolStatus === 'scheduled' ? 'Mídia removida após o agendamento' : 'Sem mídia';
-        thumb.textContent = t.metricoolStatus === 'scheduled' ? '✓' : 'sem\nmídia';
+        thumb.title = t.publishStatus === 'published' ? 'Mídia removida após a publicação' : 'Sem mídia';
+        thumb.textContent = t.publishStatus === 'published' ? '✓' : 'sem\nmídia';
       }
       row.appendChild(thumb);
 
@@ -2870,16 +2812,21 @@
       chip.textContent = status === 'pending' ? 'Pendente' : (status === 'approved' ? 'Aprovado' : 'Rejeitado');
       row.appendChild(chip);
 
-      if (t.metricoolStatus === 'scheduled') {
+      if (t.publishStatus === 'published') {
         var igChip = document.createElement('span');
         igChip.className = 'status-chip scheduled';
         igChip.textContent = '✓ No Instagram';
         row.appendChild(igChip);
-      } else if (t.metricoolStatus === 'error') {
+      } else if (t.publishStatus === 'scheduled' || t.publishStatus === 'publishing') {
+        var igSchedChip = document.createElement('span');
+        igSchedChip.className = 'status-chip scheduled';
+        igSchedChip.textContent = '🕒 Agendado';
+        row.appendChild(igSchedChip);
+      } else if (t.publishStatus === 'error') {
         var igErrChip = document.createElement('span');
         igErrChip.className = 'status-chip ig-error';
-        igErrChip.title = t.metricoolError || '';
-        igErrChip.textContent = '⚠ Erro ao agendar';
+        igErrChip.title = t.publishError || '';
+        igErrChip.textContent = '⚠ Erro ao publicar';
         row.appendChild(igErrChip);
       }
 
@@ -2950,10 +2897,10 @@
           title: t.title || '(sem título)', sub: t.approver ? ('Aprovador: ' + t.approver) : 'Sem aprovador definido', taskId: t.id
         });
       }
-      if (t.metricoolStatus === 'error') {
+      if (t.publishStatus === 'error') {
         list.push({
-          id: 'error:' + t.id, group: 'Erros de agendamento', dot: 'error',
-          title: t.title || '(sem título)', sub: t.metricoolError || 'Falha ao agendar no Metricool', taskId: t.id
+          id: 'error:' + t.id, group: 'Erros de publicação', dot: 'error',
+          title: t.title || '(sem título)', sub: t.publishError || 'Falha ao publicar no Instagram', taskId: t.id
         });
       }
     });
@@ -3024,26 +2971,36 @@
     renderNotifications();
   });
 
-  /* ---------- integração metricool (token guardado só neste navegador) ---------- */
+  /* ---------- integração instagram (a chave real fica só no servidor, nunca aqui) ---------- */
 
-  function updateMetricoolUI() {
-    var connected = !!(state.metricool && state.metricool.apiToken && state.metricool.blogId);
-    $('#metricool-dot').classList.toggle('on', connected);
-    var badge = $('#metricool-badge');
+  function updateInstagramUI(connected) {
+    var dot = $('#instagram-dot');
+    if (dot) dot.classList.toggle('on', !!connected);
+    var badge = $('#instagram-badge');
     if (badge) {
-      badge.textContent = connected ? 'Conectado' : 'Não conectado';
-      badge.classList.toggle('on', connected);
+      badge.textContent = connected === true ? 'Conectado' : (connected === false ? 'Erro' : 'Não verificado');
+      badge.classList.toggle('on', connected === true);
     }
   }
 
-  $('#btn-save-metricool').addEventListener('click', function () {
-    var apiToken = $('#metricool-token').value.trim();
-    var blogId = $('#metricool-blogid').value.trim();
-    var data = { apiToken: apiToken, blogId: blogId };
-    state.metricool = data;
-    try { localStorage.setItem('ps_metricool', JSON.stringify(data)); } catch (e) {}
-    updateMetricoolUI();
-    showToast('Dados do Metricool salvos neste navegador.');
+  $('#btn-test-instagram').addEventListener('click', function () {
+    var statusEl = $('#instagram-status');
+    if (!authClient) { showToast('Aguarde a conexão com o servidor terminar e tente de novo.'); return; }
+    statusEl.textContent = 'Testando conexão…';
+    authClient.functions.invoke('publish-instagram', { body: { action: 'test' } }).then(function (res) {
+      var data = res && res.data;
+      if (data && data.ok) {
+        updateInstagramUI(true);
+        statusEl.textContent = 'Conectado! Conta: @' + (data.username || '?');
+        showToast('Conectado ao Instagram.');
+      } else {
+        updateInstagramUI(false);
+        statusEl.textContent = (data && data.error) || 'Não foi possível confirmar a conexão com o Instagram.';
+      }
+    }).catch(function (err) {
+      updateInstagramUI(false);
+      statusEl.textContent = 'Não foi possível falar com o servidor: ' + (err && err.message ? err.message : 'erro desconhecido.');
+    });
   });
 
   /* ---------- integração supabase (fonte de dados real) ---------- */
@@ -3217,8 +3174,9 @@
   var TASK_FIELD_MAP = {
     dateEnd: 'date_end', timeSpent: 'time_spent', timerStartedAt: 'timer_started_at',
     includeInReport: 'include_in_report', approvalStatus: 'approval_status',
-    scheduledAt: 'scheduled_at', igType: 'ig_type', metricoolStatus: 'metricool_status',
-    metricoolError: 'metricool_error', createdAt: 'created_at', updatedAt: 'updated_at',
+    scheduledAt: 'scheduled_at', igType: 'ig_type', publishStatus: 'publish_status',
+    publishError: 'publish_error', publishedAt: 'published_at', igMediaId: 'ig_media_id',
+    igPermalink: 'ig_permalink', createdAt: 'created_at', updatedAt: 'updated_at',
     isExample: 'is_example'
   };
   var TASK_FIELD_MAP_REV = {};
@@ -3438,16 +3396,6 @@
     if ($('#supabase-url')) $('#supabase-url').value = savedUrl;
     if ($('#supabase-key')) $('#supabase-key').value = savedKey;
     connectSupabase(savedUrl, savedKey);
-
-    try {
-      var mt = JSON.parse(localStorage.getItem('ps_metricool') || 'null');
-      if (mt) {
-        state.metricool = mt;
-        if ($('#metricool-token')) $('#metricool-token').value = mt.apiToken || '';
-        if ($('#metricool-blogid')) $('#metricool-blogid').value = mt.blogId || '';
-        updateMetricoolUI();
-      }
-    } catch (e) {}
 
     $('#btn-download-summary').hidden = false;
   }
