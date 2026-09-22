@@ -985,6 +985,128 @@
   }
   .media-upload-btn:hover { border-color: var(--accent); color: var(--accent); }
 
+  /* ---------- tela de login (layout do Supabase, cores/fontes do P Studio) ---------- */
+  .login-screen {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+  }
+  @media (min-width: 900px) {
+    .login-screen { justify-content: flex-start; }
+  }
+  .login-left {
+    width: 100%;
+    max-width: 460px;
+    flex-shrink: 0;
+    padding: 32px clamp(24px, 5vw, 64px);
+    display: flex;
+    flex-direction: column;
+  }
+  .login-topbar { display: flex; align-items: center; gap: 10px; }
+  .login-topbar .login-logo-mark {
+    width: 30px; height: 30px; flex-shrink: 0;
+    border-radius: var(--radius-sm);
+    background: var(--accent);
+    color: var(--accent-contrast);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-weight: 700; font-size: 15px;
+  }
+  .login-topbar .login-wordmark { font-family: var(--font-display); font-weight: 600; font-size: 16px; letter-spacing: -0.01em; }
+
+  .login-center {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .login-card {
+    width: 100%;
+    max-width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .login-card h1 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text);
+  }
+  .login-card .login-sub { margin: -8px 0 4px 0; font-size: 14px; color: var(--text-muted); }
+  .login-card label { font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; display: block; }
+  .login-card input {
+    font-family: var(--font-body);
+    font-size: 14px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    width: 100%;
+  }
+  .login-card input:focus { outline: none; border-color: var(--accent); }
+  .login-btn {
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 14px;
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: var(--accent);
+    color: var(--accent-contrast);
+    cursor: pointer;
+    width: 100%;
+  }
+  .login-btn:hover { background: var(--accent-2); }
+  .login-error { min-height: 16px; font-size: 12.5px; color: var(--danger); margin: 0; }
+
+  /* painel direito: frase do dia, só desktop, gradiente da identidade */
+  .login-right {
+    display: none;
+  }
+  @media (min-width: 900px) {
+    .login-right {
+      display: flex;
+      flex: 1;
+      align-items: center;
+      padding: 48px clamp(32px, 6vw, 96px);
+      background: var(--board-bg);
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .login-quote-mark {
+      font-family: var(--font-display);
+      font-size: 90px;
+      line-height: 1;
+      font-weight: 700;
+      color: rgba(255,255,255,0.22);
+      margin: 0 0 -18px -4px;
+    }
+    .login-quote-desktop {
+      max-width: 560px;
+      font-family: var(--font-display);
+      font-size: 26px;
+      line-height: 1.45;
+      font-weight: 500;
+      color: #fff;
+      min-height: 115px;
+    }
+    .login-quote-attrib { margin-top: 20px; font-size: 14px; color: rgba(255,255,255,0.72); font-family: var(--font-body); }
+  }
+  .login-cursor {
+    display: inline-block;
+    width: 2px;
+    margin-left: 2px;
+    background: #fff;
+    animation: login-blink 0.9s steps(1) infinite;
+  }
+  @keyframes login-blink { 50% { opacity: 0; } }
+
   .integration-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -1041,7 +1163,39 @@
   })();
 </script>
 
-<div class="shell">
+<div class="login-screen" id="login-screen" hidden>
+  <div class="login-left">
+    <div class="login-topbar">
+      <span class="login-logo-mark" aria-hidden="true">P</span>
+      <span class="login-wordmark">P Studio</span>
+    </div>
+    <div class="login-center">
+      <form class="login-card" id="login-form">
+        <h1>Bem-vindo de volta</h1>
+        <p class="login-sub">Entre na sua conta para continuar</p>
+        <div>
+          <label for="login-email">E-mail</label>
+          <input id="login-email" type="email" autocomplete="username" required placeholder="voce@exemplo.com">
+        </div>
+        <div>
+          <label for="login-password">Senha</label>
+          <input id="login-password" type="password" autocomplete="current-password" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="login-btn">Entrar</button>
+        <p class="login-error" id="login-error"></p>
+      </form>
+    </div>
+  </div>
+  <div class="login-right">
+    <div>
+      <p class="login-quote-mark" aria-hidden="true">&ldquo;</p>
+      <p class="login-quote-desktop" id="login-quote" aria-live="polite"><span id="login-quote-text"></span><span class="login-cursor" id="login-cursor">&nbsp;</span></p>
+      <p class="login-quote-attrib">P Studio · frase do dia</p>
+    </div>
+  </div>
+</div>
+
+<div class="shell" id="app-shell" hidden>
   <nav class="rail" id="rail" aria-label="Navegação principal" title="Duplo clique para recolher/expandir">
     <div class="rail-top">
       <div class="rail-mark" aria-hidden="true">P</div>
@@ -1176,6 +1330,14 @@
       <div class="view-header">
         <h2>Seu perfil</h2>
         <p>Como seu nome aparece nos cards e no resumo para o gestor.</p>
+      </div>
+      <div class="integration-card" style="margin-bottom:16px;">
+        <div class="integration-status-row">
+          <span class="integration-dot on"></span>
+          <strong>Conta</strong>
+        </div>
+        <p class="hint" id="account-email"></p>
+        <button id="btn-logout" class="btn btn-ghost btn-small" style="align-self:flex-start;" type="button">Sair</button>
       </div>
       <div class="profile-card">
         <div class="profile-avatar-row">
@@ -3049,20 +3211,75 @@
     };
   }
 
-  function connectSupabase(url, key) {
-    if (!url || !key) {
-      state.loaded = true;
-      renderBoard();
-      showBanner('Configure a URL e a chave do seu projeto Supabase em Perfil para salvar de verdade.');
-      return;
-    }
-    if (typeof window.supabase === 'undefined') {
-      state.loaded = true;
-      renderBoard();
-      showBanner('Não foi possível carregar a biblioteca do Supabase (verifique sua conexão com a internet e recarregue a página).');
-      return;
-    }
-    var client = window.supabase.createClient(url, key);
+  /* ---------- frase motivacional do dia (só desktop, efeito de digitação) ---------- */
+
+  var MOTIVATIONAL_QUOTES = [
+    'Feito é melhor que perfeito.',
+    'Constância vence intensidade.',
+    'Pequenos progressos, todos os dias.',
+    'O trabalho de hoje é a confiança de amanhã.',
+    'Clareza vem da ação, não da espera.',
+    'Cada entrega é uma prova do seu valor.',
+    'Disciplina é lembrar do que você quer.',
+    'Comece onde você está, com o que você tem.',
+    'Resultado bom nasce de rotina boa.',
+    'O que é medido, melhora.',
+    'Organização hoje, tranquilidade amanhã.',
+    'Um passo de cada vez constrói o impossível.',
+    'Foco é dizer não a quase tudo.',
+    'Sua reputação se constrói entrega por entrega.',
+    'Simplifique o processo, amplifique o resultado.',
+    'A consistência é o que separa bom de ótimo.',
+    'Prioridade é o que você faz primeiro, não o que fala primeiro.',
+    'Progresso imperfeito ainda é progresso.',
+    'Quem organiza o caos, lidera.',
+    'Hoje é um bom dia para terminar algo importante.',
+    'Trabalho bem feito fala por si.',
+    'A calma no processo gera qualidade no resultado.',
+    'Menos ruído, mais entrega.',
+    'Cada tarefa concluída é um degrau.',
+    'Planeje o dia antes que o dia te planeje.',
+    'O detalhe é o que separa o bom do memorável.',
+    'Confiança se constrói com constância.',
+    'Você não precisa ver o caminho todo, só o próximo passo.',
+    'Excelência é hábito, não acidente.',
+    'Termine o que começa — isso já é raro.',
+    'A ordem de hoje evita o aperto de amanhã.'
+  ];
+
+  var quoteTypeTimer = null;
+  function typewriteQuote() {
+    var textEl = $('#login-quote-text');
+    if (!textEl) return;
+    var start = new Date(new Date().getFullYear(), 0, 0);
+    var dayOfYear = Math.floor((new Date() - start) / 86400000);
+    var quote = MOTIVATIONAL_QUOTES[dayOfYear % MOTIVATIONAL_QUOTES.length];
+    if (quoteTypeTimer) clearInterval(quoteTypeTimer);
+    textEl.textContent = '';
+    var i = 0;
+    quoteTypeTimer = setInterval(function () {
+      i++;
+      textEl.textContent = quote.slice(0, i);
+      if (i >= quote.length) clearInterval(quoteTypeTimer);
+    }, 35);
+  }
+
+  /* ---------- autenticação (só entra quem tiver login no Supabase) ---------- */
+
+  var authClient = null;
+
+  function showApp() {
+    $('#login-screen').hidden = true;
+    $('#app-shell').hidden = false;
+  }
+  function showLogin(message) {
+    $('#app-shell').hidden = true;
+    $('#login-screen').hidden = false;
+    $('#login-error').textContent = message || '';
+    typewriteQuote();
+  }
+
+  function loadUserData(client) {
     state.db = makeSupabaseDb(client);
     state.db.collection('tasks').onSnapshot(bootFromSnapshot, function (err) {
       showBanner('Não foi possível sincronizar os dados (' + errMsg(err) + '). Confira a URL/chave do Supabase em Perfil.');
@@ -3071,6 +3288,55 @@
       if (snap.exists) applyProfile(snap.data());
     }).catch(function () {});
   }
+
+  function connectSupabase(url, key) {
+    if (!url || !key) { showLogin('Configure a URL e a chave do Supabase antes de entrar.'); return; }
+    if (typeof window.supabase === 'undefined') {
+      showLogin('Não foi possível carregar a biblioteca do Supabase — verifique sua internet e recarregue a página.');
+      return;
+    }
+    var client = window.supabase.createClient(url, key);
+    authClient = client;
+
+    client.auth.getSession().then(function (res) {
+      var session = res.data && res.data.session;
+      if (session) {
+        $('#account-email').textContent = 'Conectado como ' + session.user.email;
+        state.loaded = true;
+        showApp();
+        loadUserData(client);
+      } else {
+        showLogin();
+      }
+    });
+
+    client.auth.onAuthStateChange(function (event, session) {
+      if (event === 'SIGNED_IN' && session) {
+        $('#account-email').textContent = 'Conectado como ' + session.user.email;
+        showApp();
+        loadUserData(client);
+      } else if (event === 'SIGNED_OUT') {
+        state.db = null;
+        state.tasks = [];
+        showLogin();
+      }
+    });
+  }
+
+  $('#login-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!authClient) { $('#login-error').textContent = 'Configuração do Supabase ausente.'; return; }
+    var email = $('#login-email').value.trim();
+    var password = $('#login-password').value;
+    $('#login-error').textContent = '';
+    authClient.auth.signInWithPassword({ email: email, password: password }).then(function (res) {
+      if (res.error) $('#login-error').textContent = 'Não foi possível entrar: ' + res.error.message;
+    });
+  });
+
+  $('#btn-logout').addEventListener('click', function () {
+    if (authClient) authClient.auth.signOut();
+  });
 
   function boot() {
     renderBoard();
