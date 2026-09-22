@@ -316,7 +316,11 @@
   .content {
     flex: 1;
     min-width: 0;
-    padding: 28px 20px 72px 20px;
+    max-width: 1280px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 28px clamp(20px, 4vw, 48px) 72px clamp(20px, 4vw, 48px);
+    box-sizing: border-box;
   }
 
   /* ---------- topbar ---------- */
@@ -861,20 +865,28 @@
   .upcoming-date { font-family: var(--font-mono); font-size: 11.5px; color: var(--text-muted); flex-shrink: 0; font-variant-numeric: tabular-nums; }
 
   /* ---------- profile ---------- */
+  .profile-layout {
+    max-width: 640px;
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
   .profile-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 20px;
-    max-width: 460px;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 14px;
   }
   .profile-avatar-row { display: flex; align-items: center; gap: 14px; }
   .profile-avatar-row .avatar { width: 48px; height: 48px; font-size: 16px; }
-  .profile-card label { font-size: 12.5px; font-weight: 500; color: var(--text-muted); display: block; margin-bottom: 6px; }
-  .profile-card input {
+  .profile-card label, .integration-card label { font-size: 12.5px; font-weight: 500; color: var(--text-muted); display: block; margin-bottom: 6px; }
+  .profile-card input, .integration-card input {
     font-family: var(--font-body);
     font-size: 14.5px;
     padding: 10px 12px;
@@ -1113,14 +1125,53 @@
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 16px;
-    max-width: 460px;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 10px;
   }
   .integration-status-row { display: flex; align-items: center; gap: 10px; }
+  .integration-status-row strong { font-size: 14.5px; }
+  .integration-status-badge {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    color: var(--text-muted);
+  }
+  .integration-status-badge.on { background: rgba(52,168,83,0.12); color: var(--approved, #2e9e4f); }
   .integration-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--status-todo); flex-shrink: 0; }
   .integration-dot.on { background: var(--approved); }
+  .integration-advanced {
+    margin-top: 2px;
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+  }
+  .integration-advanced > summary {
+    cursor: pointer;
+    list-style: none;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    user-select: none;
+  }
+  .integration-advanced > summary::-webkit-details-marker { display: none; }
+  .integration-advanced > summary::before {
+    content: '›';
+    display: inline-block;
+    font-size: 14px;
+    transition: transform 0.15s ease;
+  }
+  .integration-advanced[open] > summary::before { transform: rotate(90deg); }
+  .integration-advanced > summary:hover { color: var(--text); }
+  .integration-advanced-body { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
   .integration-brand-list { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
   .integration-brand-option {
     display: flex; align-items: center; gap: 8px;
@@ -1331,7 +1382,8 @@
         <h2>Seu perfil</h2>
         <p>Como seu nome aparece nos cards e no resumo para o gestor.</p>
       </div>
-      <div class="integration-card" style="margin-bottom:16px;">
+      <div class="profile-layout">
+      <div class="integration-card">
         <div class="integration-status-row">
           <span class="integration-dot on"></span>
           <strong>Conta</strong>
@@ -1370,42 +1422,55 @@
         </div>
       </div>
 
-      <div class="integration-card" style="margin-top:16px;">
+      <div class="integration-card">
         <div class="integration-status-row">
           <span class="integration-dot" id="metricool-dot"></span>
           <strong id="metricool-title">Instagram via Metricool</strong>
+          <span class="integration-status-badge" id="metricool-badge">Não conectado</span>
         </div>
-        <p class="hint" id="metricool-desc">Agendamento automático ainda não está ligado nesta versão. Para funcionar, é preciso um token de API do Metricool (Configurações → API, no plano Advanced) — guarde aqui por enquanto; a chamada real será implementada depois de confirmar o formato oficial da API do Metricool.</p>
-        <div style="width:100%;">
-          <label for="metricool-token">User token da API</label>
-          <input id="metricool-token" placeholder="cole seu token do Metricool">
-        </div>
-        <div style="width:100%;">
-          <label for="metricool-blogid">Blog ID</label>
-          <input id="metricool-blogid" placeholder="ex: 7054483">
-        </div>
-        <button id="btn-save-metricool" class="btn btn-secondary btn-small" style="align-self:flex-start;" type="button">Salvar</button>
+        <p class="hint" id="metricool-desc">Agendamento automático dos seus posts no Instagram. A conexão é privada e guardada só neste navegador — nada aparece visível na tela do dia a dia.</p>
+        <details class="integration-advanced">
+          <summary>Configurações avançadas</summary>
+          <div class="integration-advanced-body">
+            <div style="width:100%;">
+              <label for="metricool-token">User token da API</label>
+              <input id="metricool-token" type="password" autocomplete="off" placeholder="cole seu token do Metricool">
+            </div>
+            <div style="width:100%;">
+              <label for="metricool-blogid">Blog ID</label>
+              <input id="metricool-blogid" type="password" autocomplete="off" placeholder="ex: 7054483">
+            </div>
+            <button id="btn-save-metricool" class="btn btn-secondary btn-small" style="align-self:flex-start;" type="button">Salvar</button>
+          </div>
+        </details>
       </div>
 
-      <div class="integration-card" style="margin-top:16px;">
+      <div class="integration-card">
         <div class="integration-status-row">
           <span class="integration-dot" id="supabase-dot"></span>
-          <strong>Banco de dados (Supabase)</strong>
+          <strong>Banco de dados</strong>
+          <span class="integration-status-badge" id="supabase-badge">Verificando…</span>
         </div>
-        <p class="hint" id="supabase-desc">Todos os dados do P Studio (tarefas, posts, perfil) ficam salvos no seu próprio projeto Supabase.</p>
-        <div style="width:100%;">
-          <label for="supabase-url">URL do projeto</label>
-          <input id="supabase-url" placeholder="https://xxxxx.supabase.co" value="https://iqueoolbondwqjpqiupf.supabase.co">
-        </div>
-        <div style="width:100%;">
-          <label for="supabase-key">Publishable key</label>
-          <input id="supabase-key" placeholder="sb_publishable_..." value="sb_publishable_QlAu59ziKU4e2I_q7X5CaQ_Z1dANd4w">
-        </div>
-        <div style="display:flex; gap:8px;">
-          <button id="btn-save-supabase" class="btn btn-secondary btn-small" type="button">Salvar e reconectar</button>
-          <button id="btn-test-supabase" class="btn btn-primary btn-small" type="button">Testar conexão</button>
-        </div>
-        <p class="hint" id="supabase-status" style="margin-top:2px;"></p>
+        <p class="hint" id="supabase-desc">Todos os seus dados (tarefas, posts, perfil) ficam salvos com segurança no seu banco de dados privado. Só a sua conta consegue acessá-los.</p>
+        <details class="integration-advanced">
+          <summary>Configurações avançadas</summary>
+          <div class="integration-advanced-body">
+            <div style="width:100%;">
+              <label for="supabase-url">URL do projeto</label>
+              <input id="supabase-url" type="password" autocomplete="off" placeholder="https://xxxxx.supabase.co" value="https://iqueoolbondwqjpqiupf.supabase.co">
+            </div>
+            <div style="width:100%;">
+              <label for="supabase-key">Publishable key</label>
+              <input id="supabase-key" type="password" autocomplete="off" placeholder="sb_publishable_..." value="sb_publishable_QlAu59ziKU4e2I_q7X5CaQ_Z1dANd4w">
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button id="btn-save-supabase" class="btn btn-secondary btn-small" type="button">Salvar e reconectar</button>
+              <button id="btn-test-supabase" class="btn btn-primary btn-small" type="button">Testar conexão</button>
+            </div>
+            <p class="hint" id="supabase-status" style="margin-top:2px;"></p>
+          </div>
+        </details>
+      </div>
       </div>
     </div>
   </div>
@@ -2964,9 +3029,11 @@
   function updateMetricoolUI() {
     var connected = !!(state.metricool && state.metricool.apiToken && state.metricool.blogId);
     $('#metricool-dot').classList.toggle('on', connected);
-    $('#metricool-desc').textContent = connected
-      ? 'Token e Blog ID salvos neste navegador. O agendamento automático ainda depende de eu implementar a chamada real à API do Metricool — avise quando quiser que eu faça isso.'
-      : 'Agendamento automático ainda não está ligado nesta versão. Para funcionar, é preciso um token de API do Metricool (Configurações → API, no plano Advanced) — guarde aqui por enquanto; a chamada real será implementada depois de confirmar o formato oficial da API do Metricool.';
+    var badge = $('#metricool-badge');
+    if (badge) {
+      badge.textContent = connected ? 'Conectado' : 'Não conectado';
+      badge.classList.toggle('on', connected);
+    }
   }
 
   $('#btn-save-metricool').addEventListener('click', function () {
@@ -2985,6 +3052,11 @@
     var connected = !!(state.db);
     var dot = $('#supabase-dot');
     if (dot) dot.classList.toggle('on', connected);
+    var badge = $('#supabase-badge');
+    if (badge) {
+      badge.textContent = connected ? 'Conectado' : 'Não conectado';
+      badge.classList.toggle('on', connected);
+    }
   }
 
   $('#btn-save-supabase').addEventListener('click', function () {
@@ -3290,6 +3362,7 @@
 
   function loadUserData(client) {
     state.db = makeSupabaseDb(client);
+    updateSupabaseUI();
     state.db.collection('tasks').onSnapshot(bootFromSnapshot, function (err) {
       showBanner(friendlySyncError(err));
     });
@@ -3329,6 +3402,7 @@
       } else if (event === 'SIGNED_OUT') {
         state.db = null;
         state.tasks = [];
+        updateSupabaseUI();
         showLogin();
       }
     });
