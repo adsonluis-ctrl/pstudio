@@ -323,11 +323,12 @@
   .topbar { margin-bottom: 22px; }
   .topbar h1 {
     font-family: var(--font-display);
-    font-weight: 500;
-    font-size: clamp(28px, 4vw, 38px);
-    margin: 0 0 6px 0;
-    text-wrap: balance;
-    letter-spacing: -0.02em;
+    font-weight: 600;
+    font-size: 13px;
+    margin: 0;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
   .topbar-tagline { font-family: var(--font-body); font-weight: 400; color: var(--text-muted); font-size: 0.55em; letter-spacing: 0.02em; }
   .topbar .subtitle {
@@ -1235,8 +1236,7 @@
     <header class="topbar">
       <div class="topbar-row">
         <div>
-          <h1>P Studio <span class="topbar-tagline">· Creative Company</span></h1>
-          <p class="subtitle">Seu registro de entregas, com evidências, para conversar com confiança sobre o que você fez.</p>
+          <h1>P Studio</h1>
         </div>
         <button id="btn-notif-bell" class="notif-bell" type="button" title="Notificações" aria-label="Notificações">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
@@ -1662,6 +1662,15 @@
   function uid() { return Math.random().toString(36).slice(2, 10); }
 
   function errMsg(err) { return (err && err.message) ? err.message : 'erro desconhecido'; }
+
+  function isClockSkewError(err) {
+    return /issued at future|iat.*future|JWT.*future/i.test(errMsg(err));
+  }
+  var CLOCK_SKEW_MESSAGE = 'A data/hora do seu computador está incorreta, e isso invalida o login (o Supabase recusa um token "emitido no futuro"). Ajuste o relógio do seu computador para "automático" (data e hora da internet) e recarregue a página.';
+  function friendlySyncError(err) {
+    if (isClockSkewError(err)) return CLOCK_SKEW_MESSAGE;
+    return 'Não foi possível sincronizar os dados (' + errMsg(err) + '). Confira a URL/chave do Supabase em Perfil.';
+  }
 
   function taskType(t) { return (t && t.type) || 'task'; }
   function nonPostTasks() { return state.tasks.filter(function (t) { return taskType(t) !== 'post'; }); }
@@ -3282,7 +3291,7 @@
   function loadUserData(client) {
     state.db = makeSupabaseDb(client);
     state.db.collection('tasks').onSnapshot(bootFromSnapshot, function (err) {
-      showBanner('Não foi possível sincronizar os dados (' + errMsg(err) + '). Confira a URL/chave do Supabase em Perfil.');
+      showBanner(friendlySyncError(err));
     });
     state.db.collection('settings').doc('profile').get().then(function (snap) {
       if (snap.exists) applyProfile(snap.data());
@@ -3308,6 +3317,8 @@
       } else {
         showLogin();
       }
+    }).catch(function (err) {
+      showLogin(isClockSkewError(err) ? CLOCK_SKEW_MESSAGE : ('Não foi possível verificar sua sessão (' + errMsg(err) + ').'));
     });
 
     client.auth.onAuthStateChange(function (event, session) {
@@ -3330,7 +3341,11 @@
     var password = $('#login-password').value;
     $('#login-error').textContent = '';
     authClient.auth.signInWithPassword({ email: email, password: password }).then(function (res) {
-      if (res.error) $('#login-error').textContent = 'Não foi possível entrar: ' + res.error.message;
+      if (res.error) {
+        $('#login-error').textContent = isClockSkewError(res.error) ? CLOCK_SKEW_MESSAGE : ('Não foi possível entrar: ' + res.error.message);
+      }
+    }).catch(function (err) {
+      $('#login-error').textContent = isClockSkewError(err) ? CLOCK_SKEW_MESSAGE : ('Não foi possível entrar (' + errMsg(err) + ').');
     });
   });
 
