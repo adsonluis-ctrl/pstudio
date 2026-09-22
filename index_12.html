@@ -1,0 +1,1520 @@
+<title>P Studio</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --surface: #FFFFFF;
+    --surface-2: #F0F0F2;
+    --border: #E3E4E7;
+    --text: #0A0A0A;
+    --text-muted: #5B5F66;
+    --accent: #195AB4;
+    --accent-contrast: #FFFFFF;
+    --accent-soft: #E4EDF8;
+    --status-todo: #8B93A6;
+    --status-doing: #B8862E;
+    --status-done: #1F8A5F;
+    --danger: #C33F2E;
+    --danger-soft: #F5DFDB;
+    --shadow: 0 8px 24px rgba(10, 10, 10, 0.10);
+    --shadow-sm: 0 1px 4px rgba(10, 10, 10, 0.07);
+
+    --rail-bg: #000000;
+    --rail-text: #C9CBCE;
+    --rail-text-dim: #6B6E73;
+    --rail-active-bg: rgba(25, 90, 180, 0.20);
+
+    --font-display: 'IBM Plex Sans', Helvetica, Arial, sans-serif;
+    --font-body: 'IBM Plex Sans', Helvetica, Arial, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0A0A0C;
+      --surface: #131417;
+      --surface-2: #1B1D21;
+      --border: #2A2C31;
+      --text: #F2F3F4;
+      --text-muted: #9A9DA3;
+      --accent: #4C8DDE;
+      --accent-contrast: #0A0A0C;
+      --accent-soft: #172234;
+      --status-todo: #8B93A6;
+      --status-doing: #D9A544;
+      --status-done: #35B583;
+      --danger: #E0674B;
+      --danger-soft: #2E1B16;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+      --rail-active-bg: rgba(76, 141, 222, 0.24);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0A0A0C;
+    --surface: #131417;
+    --surface-2: #1B1D21;
+    --border: #2A2C31;
+    --text: #F2F3F4;
+    --text-muted: #9A9DA3;
+    --accent: #4C8DDE;
+    --accent-contrast: #0A0A0C;
+    --accent-soft: #172234;
+    --status-todo: #8B93A6;
+    --status-doing: #D9A544;
+    --status-done: #35B583;
+    --danger: #E0674B;
+    --danger-soft: #2E1B16;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+    --rail-active-bg: rgba(76, 141, 222, 0.24);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    margin: 0;
+  }
+
+  a { color: var(--accent); }
+  button { font-family: var(--font-body); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+
+  /* ---------- shell / rail ---------- */
+  .shell {
+    display: flex;
+    align-items: flex-start;
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+  .rail {
+    flex-shrink: 0;
+    width: 76px;
+    background: var(--rail-bg);
+    border-radius: 10px;
+    margin: 20px 0 20px 12px;
+    padding-block: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    position: sticky;
+    top: 20px;
+  }
+  .rail-mark {
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    background: var(--accent);
+    color: var(--accent-contrast);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+  .rail-btn {
+    background: transparent;
+    border: none;
+    color: var(--rail-text);
+    cursor: pointer;
+    width: 58px;
+    padding: 8px 4px 7px 4px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 10.5px;
+    font-family: var(--font-body);
+  }
+  .rail-btn svg { width: 19px; height: 19px; }
+  .rail-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
+  .rail-btn.primary, .rail-btn.active { background: var(--rail-active-bg); color: var(--accent); }
+  .rail-btn.primary:hover, .rail-btn.active:hover { background: var(--rail-active-bg); color: var(--accent); }
+  .rail-spacer { flex: 1; }
+  .rail-btn.ghost { color: var(--rail-text-dim); }
+  .rail-btn.ghost:hover { color: var(--rail-text); }
+
+  @media (max-width: 760px) {
+    .shell { flex-direction: column; }
+    .rail {
+      width: auto;
+      flex-direction: row;
+      margin: 12px 12px 0 12px;
+      position: static;
+      padding: 10px 12px;
+      gap: 4px;
+    }
+    .rail-mark { margin: 0 8px 0 0; }
+    .rail-spacer { display: none; }
+    .rail-btn { width: auto; flex-direction: row; padding: 8px 10px; font-size: 12px; }
+    .rail-btn svg { width: 16px; height: 16px; }
+  }
+
+  .content {
+    flex: 1;
+    min-width: 0;
+    padding: 28px 20px 72px 20px;
+  }
+
+  /* ---------- topbar ---------- */
+  .topbar { margin-bottom: 22px; }
+  .topbar h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(28px, 4vw, 38px);
+    margin: 0 0 6px 0;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+  .topbar-tagline { font-family: var(--font-body); font-weight: 400; color: var(--text-muted); font-size: 0.55em; letter-spacing: 0.02em; }
+  .topbar .subtitle {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 15px;
+    max-width: 50ch;
+  }
+
+  /* ---------- buttons ---------- */
+  .btn {
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 14px;
+    border-radius: 8px;
+    padding: 10px 16px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn-small { padding: 6px 12px; font-size: 13px; }
+  .btn-primary { background: var(--accent); color: var(--accent-contrast); }
+  .btn-primary:hover { filter: brightness(1.07); }
+  .btn-secondary { background: var(--surface-2); color: var(--text); border-color: var(--border); }
+  .btn-secondary:hover { background: var(--border); }
+  .btn-ghost { background: transparent; color: var(--text-muted); border-color: var(--border); }
+  .btn-ghost:hover { color: var(--text); border-color: var(--text-muted); }
+  .btn-danger { background: transparent; color: var(--danger); border-color: var(--danger); }
+  .btn-danger:hover { background: var(--danger-soft); }
+  .icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 16px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 6px;
+    border-radius: 6px;
+  }
+  .icon-btn:hover { background: var(--surface-2); color: var(--text); }
+
+  /* ---------- banner ---------- */
+  .banner {
+    background: var(--accent-soft);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13.5px;
+    margin-bottom: 18px;
+  }
+
+  /* ---------- filters ---------- */
+  .filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .filters input[type="search"],
+  .filters select {
+    font-family: var(--font-body);
+    font-size: 14px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+  }
+  #search { min-width: 220px; flex: 1 1 220px; }
+  .checkbox-inline {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13.5px;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  /* ---------- board ---------- */
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+  @media (max-width: 760px) {
+    .board { grid-template-columns: 1fr; }
+  }
+  .column {
+    background: var(--surface-2);
+    border-radius: 8px;
+    padding: 14px;
+    min-height: 120px;
+  }
+  .column-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding: 0 2px;
+  }
+  .status-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .status-dot.todo { background: var(--status-todo); }
+  .status-dot.doing { background: var(--status-doing); }
+  .status-dot.done { background: var(--status-done); }
+  .column-title {
+    font-weight: 600;
+    font-size: 13.5px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .column-count {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--text-muted);
+    background: var(--surface);
+    border-radius: 999px;
+    padding: 2px 8px;
+  }
+  .column-body { display: flex; flex-direction: column; gap: 10px; }
+  .empty-hint { color: var(--text-muted); font-size: 13px; padding: 10px 4px; margin: 0; }
+
+  /* ---------- card ---------- */
+  .card {
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 13px 14px;
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--status-todo);
+  }
+  .column[data-status="todo"] .card { border-left-color: var(--status-todo); }
+  .column[data-status="doing"] .card { border-left-color: var(--status-doing); }
+  .column[data-status="done"] .card { border-left-color: var(--status-done); }
+  .card:hover { box-shadow: var(--shadow); }
+  .card-top { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 6px; }
+  .chip {
+    font-size: 11.5px;
+    font-weight: 500;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 999px;
+    padding: 2px 9px;
+  }
+  .chip-example {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px dashed var(--border);
+  }
+  .chip-priority { font-size: 11px; font-weight: 600; border-radius: 999px; padding: 2px 8px; }
+  .chip-priority.p1 { background: var(--danger-soft); color: var(--danger); }
+  .chip-priority.p2 { background: var(--accent-soft); color: var(--accent); }
+  .chip-priority.p3 { background: var(--surface-2); color: var(--text-muted); }
+  .card-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 15.5px;
+    margin: 0 0 4px 0;
+    text-wrap: balance;
+  }
+  .card-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0 0 8px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .card-meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .avatar {
+    width: 19px;
+    height: 19px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .meta-report { color: var(--accent); }
+
+  /* ---------- modal ---------- */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 10, 12, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 50;
+  }
+  .modal {
+    background: var(--surface);
+    border-radius: 10px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow);
+  }
+  .modal-wide { max-width: 620px; }
+  .modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 8px 20px;
+  }
+  .modal-head h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 20px;
+    margin: 0;
+  }
+  #task-form { padding: 6px 20px 20px 20px; display: flex; flex-direction: column; gap: 12px; }
+  #task-form label { font-size: 12.5px; font-weight: 500; color: var(--text-muted); margin-bottom: -6px; }
+  #task-form input[type="text"],
+  #task-form input:not([type]),
+  #task-form input[type="date"],
+  #task-form textarea,
+  #task-form select {
+    font-family: var(--font-body);
+    font-size: 14.5px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    width: 100%;
+  }
+  #task-form textarea { resize: vertical; min-height: 64px; }
+  .field-row { display: flex; gap: 10px; }
+  .field-row > div { flex: 1; }
+  .links-section { border-top: 1px solid var(--border); padding-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .link-row { display: flex; gap: 6px; }
+  .link-row input { flex: 1 1 0; }
+  .hint { font-size: 12px; color: var(--text-muted); margin: 2px 0 0 0; }
+  .modal-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+  }
+  .modal-actions-right { display: flex; gap: 8px; margin-left: auto; }
+
+  /* ---------- summary ---------- */
+  .summary-controls {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    padding: 0 20px 4px 20px;
+    font-size: 13px;
+  }
+  .summary-controls label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: var(--text-muted);
+  }
+  .summary-controls input { font-family: var(--font-body); padding: 7px 9px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); }
+  .summary-preview {
+    margin: 14px 20px;
+    padding: 14px;
+    background: var(--surface-2);
+    border-radius: 10px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    max-height: 40vh;
+    overflow-y: auto;
+  }
+  .modal-wide .modal-actions { padding: 0 20px 20px 20px; margin-top: 0; }
+
+  /* ---------- views ---------- */
+  .view-header { margin-bottom: 18px; }
+  .view-header h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 22px;
+    margin: 0 0 4px 0;
+  }
+  .view-header p { margin: 0; color: var(--text-muted); font-size: 14px; }
+
+  /* ---------- dashboard ---------- */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 20px; }
+  @media (max-width: 700px) { .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .stat-tile { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+  .stat-tile .stat-value { font-family: var(--font-mono); font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .stat-tile .stat-label { font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; margin-top: 4px; }
+  .stat-tile.accent { border-color: var(--accent); }
+  .stat-tile.accent .stat-value { color: var(--accent); }
+  .dash-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 14px; }
+  @media (max-width: 860px) { .dash-grid { grid-template-columns: 1fr; } }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 18px; }
+  .panel h3 { font-family: var(--font-display); font-size: 15px; font-weight: 600; margin: 0 0 10px 0; }
+  .upcoming-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 2px;
+    border-top: 1px solid var(--border);
+    font-size: 13.5px;
+    cursor: pointer;
+  }
+  .upcoming-row:first-of-type { border-top: none; }
+  .upcoming-row:hover { color: var(--accent); }
+  .upcoming-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .upcoming-date { font-family: var(--font-mono); font-size: 11.5px; color: var(--text-muted); flex-shrink: 0; font-variant-numeric: tabular-nums; }
+
+  /* ---------- entry overlay ---------- */
+  .entry-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--rail-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 100;
+  }
+  .entry-card {
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 36px 32px;
+    max-width: 360px;
+    width: 100%;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+  .entry-mark {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: var(--accent-contrast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 17px;
+    margin: 0 auto 18px auto;
+  }
+  .entry-card h2 { font-family: var(--font-display); font-size: 20px; font-weight: 700; margin: 0 0 4px 0; color: var(--text); letter-spacing: 0.02em; }
+  .entry-tagline { margin: 0 0 22px 0; color: var(--text-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .entry-note { margin: 14px 0 0 0; color: var(--text-muted); font-size: 11.5px; line-height: 1.5; text-align: left; }
+  .entry-card input {
+    width: 100%;
+    font-family: var(--font-body);
+    font-size: 14.5px;
+    padding: 11px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .entry-card .btn { width: 100%; }
+
+  /* ---------- profile ---------- */
+  .profile-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 460px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .profile-avatar-row { display: flex; align-items: center; gap: 14px; }
+  .profile-avatar-row .avatar { width: 48px; height: 48px; font-size: 16px; }
+  .profile-card label { font-size: 12.5px; font-weight: 500; color: var(--text-muted); display: block; margin-bottom: 6px; }
+  .profile-card input {
+    font-family: var(--font-body);
+    font-size: 14.5px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    width: 100%;
+  }
+  .data-section { margin-top: 4px; padding-top: 14px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+  .data-section p { margin: 0; font-size: 12.5px; color: var(--text-muted); }
+
+  /* ---------- drag and drop ---------- */
+  .card[draggable="true"] { cursor: grab; }
+  .column-body.drag-over { outline: 2px dashed var(--accent); outline-offset: -2px; border-radius: 6px; }
+
+  /* ---------- toast ---------- */
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    background: var(--text);
+    color: var(--bg);
+    font-size: 13.5px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    box-shadow: var(--shadow);
+    z-index: 60;
+  }
+</style>
+
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem('ps_theme');
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  })();
+</script>
+
+<div class="entry-overlay" id="entry-overlay">
+  <div class="entry-card">
+    <div class="entry-mark" aria-hidden="true">P</div>
+    <h2>P STUDIO</h2>
+    <p class="entry-tagline">Creative Company</p>
+    <input id="entry-name" placeholder="Nome" autocomplete="off">
+    <input id="entry-email" type="email" placeholder="E-mail" autocomplete="off">
+    <input id="entry-password" type="password" placeholder="Senha" autocomplete="off">
+    <button id="btn-entry-submit" class="btn btn-primary" type="button">Entrar</button>
+    <p class="entry-note">Este acesso é só a porta de entrada do seu sistema — não existe servidor validando a senha. A senha não é salva em nenhum lugar; quem protege este link é o compartilhamento do Claude, que só você controla.</p>
+  </div>
+</div>
+
+<div class="shell">
+  <nav class="rail" aria-label="Navegação principal">
+    <div class="rail-mark" aria-hidden="true">P</div>
+    <button id="btn-new" class="rail-btn primary" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      Novo
+    </button>
+    <button id="nav-dashboard" class="rail-btn active" type="button" data-view="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/></svg>
+      Início
+    </button>
+    <button id="nav-board" class="rail-btn" type="button" data-view="board">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/></svg>
+      Quadro
+    </button>
+    <button id="nav-profile" class="rail-btn" type="button" data-view="profile">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
+      Perfil
+    </button>
+    <span class="rail-spacer"></span>
+    <button id="btn-theme" class="rail-btn ghost" type="button">
+      <svg id="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.5A9 9 0 1 1 11.5 3a7 7 0 0 0 9.5 9.5z"/></svg>
+      <svg id="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" hidden><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <span id="theme-label">Tema</span>
+    </button>
+    <button id="btn-summary" class="rail-btn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a1 1 0 0 1 1 1v1h1a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h1V5a1 1 0 0 1 1-1z"/><path d="M9 12h6M9 16h4"/></svg>
+      Resumo
+    </button>
+  </nav>
+
+  <div class="content">
+    <header class="topbar">
+      <h1>P Studio <span class="topbar-tagline">· Creative Company</span></h1>
+      <p class="subtitle">Seu registro de entregas, com evidências, para conversar com confiança sobre o que você fez.</p>
+    </header>
+
+    <div id="status-banner" class="banner" hidden></div>
+
+    <div class="view" data-view="dashboard" id="view-dashboard">
+      <div class="view-header">
+        <h2 id="dash-greeting">Olá!</h2>
+        <p id="dash-date"></p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-tile"><div class="stat-value" id="stat-total">0</div><div class="stat-label">Total</div></div>
+        <div class="stat-tile"><div class="stat-value" id="stat-todo">0</div><div class="stat-label">A fazer</div></div>
+        <div class="stat-tile"><div class="stat-value" id="stat-doing">0</div><div class="stat-label">Em andamento</div></div>
+        <div class="stat-tile accent"><div class="stat-value" id="stat-done">0</div><div class="stat-label">Concluídas</div></div>
+      </div>
+      <div class="dash-grid">
+        <div class="panel">
+          <h3>Próximos prazos</h3>
+          <div id="upcoming-list"></div>
+        </div>
+        <div class="panel">
+          <h3>Ação rápida</h3>
+          <p class="hint" style="margin-bottom:12px;">Registre o que você fez enquanto está fresco na memória.</p>
+          <button id="btn-new-dash" class="btn btn-primary" style="width:100%;" type="button">+ Nova entrada</button>
+          <button id="btn-summary-dash" class="btn btn-secondary" style="width:100%; margin-top:8px;" type="button">Gerar resumo</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="view" data-view="board" id="view-board" hidden>
+      <section class="filters">
+        <input id="search" type="search" placeholder="Buscar por título ou descrição…">
+        <select id="filter-category"><option value="">Todas as categorias</option></select>
+        <label class="checkbox-inline"><input type="checkbox" id="filter-report-only"> Só marcados p/ relatório</label>
+      </section>
+
+      <main class="board" id="board">
+        <div class="column" data-status="todo">
+          <div class="column-head"><span class="status-dot todo"></span><span class="column-title">A Fazer</span><span class="column-count" id="count-todo">0</span></div>
+          <div class="column-body" id="list-todo"></div>
+        </div>
+        <div class="column" data-status="doing">
+          <div class="column-head"><span class="status-dot doing"></span><span class="column-title">Em Andamento</span><span class="column-count" id="count-doing">0</span></div>
+          <div class="column-body" id="list-doing"></div>
+        </div>
+        <div class="column" data-status="done">
+          <div class="column-head"><span class="status-dot done"></span><span class="column-title">Concluído</span><span class="column-count" id="count-done">0</span></div>
+          <div class="column-body" id="list-done"></div>
+        </div>
+      </main>
+    </div>
+
+    <div class="view" data-view="profile" id="view-profile" hidden>
+      <div class="view-header">
+        <h2>Seu perfil</h2>
+        <p>Como seu nome aparece nos cards e no resumo para o gestor.</p>
+      </div>
+      <div class="profile-card">
+        <div class="profile-avatar-row">
+          <span class="avatar" id="profile-avatar-preview">·</span>
+          <div style="flex:1;">
+            <label for="profile-name">Nome</label>
+            <input id="profile-name" placeholder="Seu nome">
+          </div>
+        </div>
+        <div>
+          <label for="profile-email">E-mail</label>
+          <input id="profile-email" type="email" placeholder="seu@email.com">
+        </div>
+        <button id="btn-save-profile" class="btn btn-primary" style="align-self:flex-start;" type="button">Salvar</button>
+        <div class="data-section">
+          <p>Os exemplos ilustrativos ficam marcados com a etiqueta "exemplo" nos cards do quadro.</p>
+          <button id="btn-clear-examples" class="btn btn-ghost btn-small" type="button">Remover exemplos</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-head">
+      <h2 id="modal-title">Nova entrada</h2>
+      <button class="icon-btn" id="modal-close" aria-label="Fechar">✕</button>
+    </div>
+    <form id="task-form">
+      <div>
+        <label for="f-title">Título</label>
+        <input id="f-title" required>
+      </div>
+      <div class="field-row">
+        <div>
+          <label for="f-status">Status</label>
+          <select id="f-status">
+            <option value="todo">A Fazer</option>
+            <option value="doing">Em Andamento</option>
+            <option value="done">Concluído</option>
+          </select>
+        </div>
+        <div>
+          <label for="f-priority">Prioridade</label>
+          <select id="f-priority">
+            <option value="P1">P1 · Alta</option>
+            <option value="P2" selected>P2 · Média</option>
+            <option value="P3">P3 · Baixa</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div>
+          <label for="f-date">Início</label>
+          <input type="date" id="f-date">
+        </div>
+        <div>
+          <label for="f-date-end">Prazo final (opcional)</label>
+          <input type="date" id="f-date-end">
+        </div>
+      </div>
+      <div class="field-row">
+        <div>
+          <label for="f-category">Categoria</label>
+          <input id="f-category" list="category-list" placeholder="ex: Sinistros, Comercial…">
+          <datalist id="category-list"></datalist>
+        </div>
+        <div>
+          <label for="f-assignee">Responsável</label>
+          <input id="f-assignee" placeholder="ex: Eu">
+        </div>
+      </div>
+      <div>
+        <label for="f-desc">Descrição</label>
+        <textarea id="f-desc" placeholder="O que foi feito, e o impacto disso"></textarea>
+      </div>
+      <div class="links-section">
+        <label>Anexos (links do Google Drive)</label>
+        <div id="links-list"></div>
+        <button type="button" id="btn-add-link" class="btn btn-ghost btn-small" style="align-self:flex-start;">+ Adicionar link</button>
+        <p class="hint">Cole aqui o link de compartilhamento do arquivo no seu Drive. (Dá para conectar sua conta do Google Drive ao Claude depois, para puxar isso automaticamente.)</p>
+      </div>
+      <label class="checkbox-inline"><input type="checkbox" id="f-report"> Incluir no resumo para o gestor</label>
+      <div class="modal-actions">
+        <button type="button" id="btn-delete" class="btn btn-danger">Excluir</button>
+        <div class="modal-actions-right">
+          <button type="button" id="btn-cancel" class="btn btn-ghost">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="summary-overlay" hidden>
+  <div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="summary-title">
+    <div class="modal-head">
+      <h2 id="summary-title">Gerar resumo</h2>
+      <button class="icon-btn" id="summary-close" aria-label="Fechar">✕</button>
+    </div>
+    <div class="summary-controls">
+      <label>De <input type="date" id="sum-from"></label>
+      <label>Até <input type="date" id="sum-to"></label>
+      <button id="btn-refresh-summary" class="btn btn-secondary btn-small">Atualizar</button>
+    </div>
+    <pre id="summary-text" class="summary-preview"></pre>
+    <div class="modal-actions">
+      <div class="modal-actions-right">
+        <button id="btn-copy-summary" class="btn btn-secondary">Copiar texto</button>
+        <button id="btn-download-summary" class="btn btn-primary" hidden>Baixar .txt</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var STATUS = ['todo', 'doing', 'done'];
+  var PRIORITY_LABEL = { P1: 'P1 · Alta', P2: 'P2 · Média', P3: 'P3 · Baixa' };
+
+  var state = {
+    tasks: [],
+    loaded: false,
+    db: null,
+    downloads: null,
+    editingId: null,
+    view: 'dashboard',
+    profile: { name: '', email: '' },
+    filters: { q: '', category: '', reportOnly: false }
+  };
+
+  function $(sel, root) { return (root || document).querySelector(sel); }
+  function $all(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+
+  function todayISO() { return new Date().toISOString().slice(0, 10); }
+
+  function fmtDate(iso) {
+    if (!iso) return '';
+    var p = iso.split('-');
+    if (p.length !== 3) return iso;
+    return p[2] + '/' + p[1];
+  }
+
+  function fmtDateRange(t) {
+    var a = fmtDate(t.date);
+    var b = t.dateEnd ? fmtDate(t.dateEnd) : '';
+    if (b && b !== a) return a + '–' + b;
+    return a;
+  }
+
+  function initials(name) {
+    var n = (name || '').trim();
+    if (!n) return '·';
+    var parts = n.split(/\s+/);
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+
+  function uid() { return Math.random().toString(36).slice(2, 10); }
+
+  function errMsg(err) { return (err && err.message) ? err.message : 'erro desconhecido'; }
+
+  var toastTimer = null;
+  function showToast(msg) {
+    var t = $('#toast');
+    t.textContent = msg;
+    t.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.hidden = true; }, 2600);
+  }
+
+  function showBanner(msg) {
+    var b = $('#status-banner');
+    b.textContent = msg;
+    b.hidden = false;
+  }
+
+  /* ---------- theme ---------- */
+
+  function effectiveIsDark() {
+    var attr = document.documentElement.getAttribute('data-theme');
+    if (attr === 'dark') return true;
+    if (attr === 'light') return false;
+    return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }
+
+  function updateThemeUI() {
+    var dark = effectiveIsDark();
+    $('#theme-icon-moon').hidden = dark;
+    $('#theme-icon-sun').hidden = !dark;
+    $('#theme-label').textContent = dark ? 'Claro' : 'Escuro';
+  }
+
+  function setTheme(mode) {
+    if (mode === 'light' || mode === 'dark') {
+      document.documentElement.setAttribute('data-theme', mode);
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+    try { localStorage.setItem('ps_theme', mode || ''); } catch (e) {}
+    updateThemeUI();
+  }
+
+  $('#btn-theme').addEventListener('click', function () {
+    setTheme(effectiveIsDark() ? 'light' : 'dark');
+  });
+
+  updateThemeUI();
+
+  /* ---------- views ---------- */
+
+  function setView(v) {
+    state.view = v;
+    ['dashboard', 'board', 'profile'].forEach(function (name) {
+      var el = document.getElementById('view-' + name);
+      if (el) el.hidden = (name !== v);
+    });
+    $all('.rail-btn[data-view]').forEach(function (btn) {
+      btn.classList.toggle('active', btn.dataset.view === v);
+    });
+    if (v === 'dashboard') renderDashboard();
+    if (v === 'profile') {
+      $('#profile-name').value = state.profile.name || '';
+      $('#profile-avatar-preview').textContent = initials(state.profile.name);
+    }
+  }
+
+  $all('.rail-btn[data-view]').forEach(function (btn) {
+    btn.addEventListener('click', function () { setView(btn.dataset.view); });
+  });
+
+  /* ---------- dashboard ---------- */
+
+  function renderDashboard() {
+    var first = (state.profile.name || '').trim().split(/\s+/)[0];
+    $('#dash-greeting').textContent = first ? ('Olá, ' + first + '!') : 'Olá!';
+    var d = new Date();
+    var label = d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+    $('#dash-date').textContent = label.charAt(0).toUpperCase() + label.slice(1);
+
+    $('#stat-total').textContent = state.tasks.length;
+    $('#stat-todo').textContent = state.tasks.filter(function (t) { return t.status === 'todo'; }).length;
+    $('#stat-doing').textContent = state.tasks.filter(function (t) { return t.status === 'doing'; }).length;
+    $('#stat-done').textContent = state.tasks.filter(function (t) { return t.status === 'done'; }).length;
+
+    var upcoming = state.tasks
+      .filter(function (t) { return t.status !== 'done'; })
+      .sort(function (a, b) { return (a.date || '').localeCompare(b.date || ''); })
+      .slice(0, 6);
+    var wrap = $('#upcoming-list');
+    wrap.innerHTML = '';
+    if (!upcoming.length) {
+      var p = document.createElement('p');
+      p.className = 'empty-hint';
+      p.textContent = 'Nada pendente por aqui.';
+      wrap.appendChild(p);
+    } else {
+      upcoming.forEach(function (t) {
+        var row = document.createElement('div');
+        row.className = 'upcoming-row';
+        row.tabIndex = 0;
+        var title = document.createElement('span');
+        title.className = 'upcoming-title';
+        title.textContent = t.title;
+        var date = document.createElement('span');
+        date.className = 'upcoming-date';
+        date.textContent = fmtDateRange(t);
+        row.appendChild(title);
+        row.appendChild(date);
+        function open() { openTaskModal(t.id); }
+        row.addEventListener('click', open);
+        row.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+        wrap.appendChild(row);
+      });
+    }
+  }
+
+  /* ---------- profile ---------- */
+
+  function applyProfile(data) {
+    state.profile = { name: (data && data.name) || '', email: (data && data.email) || '' };
+    if (!$('#entry-overlay').hidden) {
+      if (state.profile.name) $('#entry-name').value = state.profile.name;
+      if (state.profile.email) $('#entry-email').value = state.profile.email;
+    }
+    if ($('#view-profile') && !$('#view-profile').hidden) {
+      $('#profile-name').value = state.profile.name;
+      $('#profile-email').value = state.profile.email;
+    }
+    $('#profile-avatar-preview').textContent = initials(state.profile.name);
+    renderDashboard();
+  }
+
+  function saveProfile(name, email) {
+    state.profile = { name: name, email: email || '' };
+    try {
+      localStorage.setItem('ps_profile_name', name);
+      localStorage.setItem('ps_profile_email', email || '');
+    } catch (e) {}
+    $('#profile-avatar-preview').textContent = initials(name);
+    if (state.db) {
+      state.db.collection('settings').doc('profile').set({ name: name, email: email || '' }).catch(function () {});
+    }
+    renderDashboard();
+  }
+
+  $('#btn-save-profile').addEventListener('click', function () {
+    var name = $('#profile-name').value.trim();
+    var email = $('#profile-email').value.trim();
+    saveProfile(name, email);
+    showToast('Perfil salvo.');
+  });
+
+  /* ---------- entry overlay ---------- */
+  /* A senha existe só para dar a sensação de login do sistema — nunca é lida além
+     deste clique, nunca é salva (nem no navegador, nem no banco de dados) e nunca
+     é validada contra nada, porque não existe backend de autenticação aqui. */
+
+  function dismissEntry() {
+    var name = $('#entry-name').value.trim();
+    var email = $('#entry-email').value.trim();
+    $('#entry-password').value = '';
+    if (name || email) saveProfile(name, email);
+    $('#entry-overlay').hidden = true;
+  }
+  $('#btn-entry-submit').addEventListener('click', dismissEntry);
+  ['entry-name', 'entry-email', 'entry-password'].forEach(function (id) {
+    $('#' + id).addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); dismissEntry(); }
+    });
+  });
+  try {
+    var savedName = localStorage.getItem('ps_profile_name');
+    var savedEmail = localStorage.getItem('ps_profile_email');
+    if (savedName) $('#entry-name').value = savedName;
+    if (savedEmail) $('#entry-email').value = savedEmail;
+    if (savedName || savedEmail) state.profile = { name: savedName || '', email: savedEmail || '' };
+  } catch (e) {}
+
+  /* ---------- rendering ---------- */
+
+  function categories() {
+    var set = {};
+    state.tasks.forEach(function (t) { if (t.category) set[t.category] = true; });
+    return Object.keys(set).sort();
+  }
+
+  function renderCategoryOptions() {
+    var sel = $('#filter-category');
+    var cur = sel.value;
+    var cats = categories();
+    sel.innerHTML = '';
+    var optAll = document.createElement('option');
+    optAll.value = ''; optAll.textContent = 'Todas as categorias';
+    sel.appendChild(optAll);
+    cats.forEach(function (c) {
+      var o = document.createElement('option'); o.value = c; o.textContent = c; sel.appendChild(o);
+    });
+    sel.value = cats.indexOf(cur) > -1 ? cur : '';
+
+    var dl = $('#category-list');
+    dl.innerHTML = '';
+    cats.forEach(function (c) {
+      var o = document.createElement('option'); o.value = c; dl.appendChild(o);
+    });
+  }
+
+  function matchesFilters(t) {
+    var f = state.filters;
+    if (f.reportOnly && !t.includeInReport) return false;
+    if (f.category && t.category !== f.category) return false;
+    if (f.q) {
+      var q = f.q.toLowerCase();
+      var hay = ((t.title || '') + ' ' + (t.description || '')).toLowerCase();
+      if (hay.indexOf(q) === -1) return false;
+    }
+    return true;
+  }
+
+  function renderBoard() {
+    renderCategoryOptions();
+    STATUS.forEach(function (status) {
+      var list = $('#list-' + status);
+      list.innerHTML = '';
+
+      if (!state.loaded) {
+        var loading = document.createElement('p');
+        loading.className = 'empty-hint';
+        loading.textContent = 'Carregando…';
+        list.appendChild(loading);
+        $('#count-' + status).textContent = '';
+        return;
+      }
+
+      var items = state.tasks.filter(function (t) { return t.status === status; }).filter(matchesFilters);
+      items.sort(function (a, b) { return (a.date || '').localeCompare(b.date || ''); });
+      $('#count-' + status).textContent = items.length;
+
+      if (items.length === 0) {
+        var p = document.createElement('p');
+        p.className = 'empty-hint';
+        p.textContent = 'Nada por aqui ainda.';
+        list.appendChild(p);
+        return;
+      }
+      items.forEach(function (t) { list.appendChild(buildCard(t)); });
+    });
+    renderDashboard();
+  }
+
+  function buildCard(t) {
+    var card = document.createElement('article');
+    card.className = 'card';
+    card.tabIndex = 0;
+    card.dataset.id = t.id;
+    if (String(t.id).indexOf('local-') !== 0) {
+      card.draggable = true;
+      card.addEventListener('dragstart', function (e) {
+        e.dataTransfer.setData('text/plain', t.id);
+        e.dataTransfer.effectAllowed = 'move';
+      });
+    }
+
+    var top = document.createElement('div');
+    top.className = 'card-top';
+    var pr = document.createElement('span');
+    pr.className = 'chip-priority ' + (t.priority || 'P2').toLowerCase();
+    pr.textContent = t.priority || 'P2';
+    top.appendChild(pr);
+    if (t.category) {
+      var chip = document.createElement('span');
+      chip.className = 'chip';
+      chip.textContent = t.category;
+      top.appendChild(chip);
+    }
+    if (t.isExample) {
+      var ex = document.createElement('span');
+      ex.className = 'chip chip-example';
+      ex.textContent = 'exemplo';
+      top.appendChild(ex);
+    }
+    card.appendChild(top);
+
+    var h3 = document.createElement('h3');
+    h3.className = 'card-title';
+    h3.textContent = t.title || '(sem título)';
+    card.appendChild(h3);
+
+    if (t.description) {
+      var desc = document.createElement('p');
+      desc.className = 'card-desc';
+      desc.textContent = t.description;
+      card.appendChild(desc);
+    }
+
+    var meta = document.createElement('div');
+    meta.className = 'card-meta';
+    var av = document.createElement('span');
+    av.className = 'avatar';
+    av.textContent = initials(t.assignee);
+    av.title = t.assignee || '';
+    meta.appendChild(av);
+    if (t.date) {
+      var d = document.createElement('span');
+      d.textContent = fmtDateRange(t);
+      meta.appendChild(d);
+    }
+    if (t.links && t.links.length) {
+      var l = document.createElement('span');
+      l.textContent = '📎 ' + t.links.length;
+      meta.appendChild(l);
+    }
+    if (t.includeInReport) {
+      var r = document.createElement('span');
+      r.className = 'meta-report';
+      r.textContent = '✓ relatório';
+      meta.appendChild(r);
+    }
+    card.appendChild(meta);
+
+    function open() { openTaskModal(t.id); }
+    card.addEventListener('click', open);
+    card.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+    });
+
+    return card;
+  }
+
+  /* ---------- task modal ---------- */
+
+  var linkRows = [];
+
+  function openTaskModal(id) {
+    state.editingId = id || null;
+    var t = id ? state.tasks.find(function (x) { return x.id === id; }) : null;
+    $('#modal-title').textContent = t ? 'Editar entrada' : 'Nova entrada';
+    $('#f-title').value = t ? (t.title || '') : '';
+    $('#f-status').value = t ? t.status : 'todo';
+    $('#f-priority').value = t ? (t.priority || 'P2') : 'P2';
+    $('#f-category').value = t ? (t.category || '') : '';
+    $('#f-assignee').value = t ? (t.assignee || '') : (state.profile.name || 'Eu');
+    $('#f-date').value = t ? (t.date || '') : todayISO();
+    $('#f-date-end').value = t ? (t.dateEnd || '') : '';
+    $('#f-desc').value = t ? (t.description || '') : '';
+    $('#f-report').checked = t ? !!t.includeInReport : true;
+    linkRows = (t && t.links) ? t.links.map(function (l) { return { label: l.label || '', url: l.url || '' }; }) : [];
+    renderLinkRows();
+    $('#btn-delete').hidden = !t;
+    $('#modal-overlay').hidden = false;
+    $('#f-title').focus();
+  }
+
+  function closeTaskModal() {
+    $('#modal-overlay').hidden = true;
+    state.editingId = null;
+  }
+
+  function renderLinkRows() {
+    var wrap = $('#links-list');
+    wrap.innerHTML = '';
+    linkRows.forEach(function (row, idx) {
+      var r = document.createElement('div');
+      r.className = 'link-row';
+      var labelInput = document.createElement('input');
+      labelInput.placeholder = 'Nome do arquivo';
+      labelInput.value = row.label;
+      labelInput.addEventListener('input', function () { row.label = labelInput.value; });
+      var urlInput = document.createElement('input');
+      urlInput.placeholder = 'Link do Google Drive';
+      urlInput.value = row.url;
+      urlInput.addEventListener('input', function () { row.url = urlInput.value; });
+      var rm = document.createElement('button');
+      rm.type = 'button'; rm.className = 'icon-btn'; rm.setAttribute('aria-label', 'Remover link'); rm.textContent = '✕';
+      rm.addEventListener('click', function () { linkRows.splice(idx, 1); renderLinkRows(); });
+      r.appendChild(labelInput); r.appendChild(urlInput); r.appendChild(rm);
+      wrap.appendChild(r);
+    });
+  }
+
+  $('#btn-add-link').addEventListener('click', function () {
+    linkRows.push({ label: '', url: '' });
+    renderLinkRows();
+  });
+
+  $('#btn-new').addEventListener('click', function () { openTaskModal(null); });
+  $('#btn-new-dash').addEventListener('click', function () { openTaskModal(null); });
+  $('#modal-close').addEventListener('click', closeTaskModal);
+  $('#btn-cancel').addEventListener('click', closeTaskModal);
+  $('#modal-overlay').addEventListener('click', function (e) { if (e.target === $('#modal-overlay')) closeTaskModal(); });
+
+  $('#task-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var title = $('#f-title').value.trim();
+    if (!title) { $('#f-title').focus(); return; }
+    var data = {
+      title: title,
+      status: $('#f-status').value,
+      priority: $('#f-priority').value,
+      category: $('#f-category').value.trim(),
+      assignee: $('#f-assignee').value.trim() || 'Eu',
+      date: $('#f-date').value || todayISO(),
+      dateEnd: $('#f-date-end').value || '',
+      description: $('#f-desc').value.trim(),
+      includeInReport: $('#f-report').checked,
+      links: linkRows
+        .filter(function (l) { return l.label.trim() || l.url.trim(); })
+        .map(function (l) { return { label: l.label.trim() || 'Anexo', url: l.url.trim() }; }),
+      updatedAt: new Date().toISOString()
+    };
+    saveTask(state.editingId, data);
+    closeTaskModal();
+  });
+
+  $('#btn-delete').addEventListener('click', function () {
+    if (state.editingId) deleteTask(state.editingId);
+    closeTaskModal();
+  });
+
+  /* ---------- persistence ---------- */
+
+  function saveTask(id, data) {
+    if (!state.db) {
+      if (id) {
+        var t = state.tasks.find(function (x) { return x.id === id; });
+        if (t) Object.assign(t, data);
+      } else {
+        data.createdAt = data.updatedAt;
+        data.isExample = false;
+        state.tasks.push(Object.assign({ id: 'local-' + uid() }, data));
+      }
+      renderBoard();
+      showToast('Salvo nesta sessão (sem sincronização).');
+      return;
+    }
+    if (id) {
+      state.db.collection('tasks').doc(id).update(data)
+        .then(function () { showToast('Salvo.'); })
+        .catch(function (err) { showToast('Não foi possível salvar: ' + errMsg(err)); });
+    } else {
+      data.createdAt = data.updatedAt;
+      data.isExample = false;
+      state.db.collection('tasks').add(data)
+        .then(function () { showToast('Salvo.'); })
+        .catch(function (err) { showToast('Não foi possível salvar: ' + errMsg(err)); });
+    }
+  }
+
+  function deleteTask(id) {
+    if (!state.db || String(id).indexOf('local-') === 0) {
+      state.tasks = state.tasks.filter(function (x) { return x.id !== id; });
+      renderBoard();
+      showToast('Removido.');
+      return;
+    }
+    state.db.collection('tasks').doc(id).delete()
+      .then(function () { showToast('Removido.'); })
+      .catch(function (err) { showToast('Não foi possível remover: ' + errMsg(err)); });
+  }
+
+  /* ---------- filters ---------- */
+
+  $('#search').addEventListener('input', function () { state.filters.q = this.value; renderBoard(); });
+  $('#filter-category').addEventListener('change', function () { state.filters.category = this.value; renderBoard(); });
+  $('#filter-report-only').addEventListener('change', function () { state.filters.reportOnly = this.checked; renderBoard(); });
+
+  $('#btn-clear-examples').addEventListener('click', function () {
+    var examples = state.tasks.filter(function (t) { return t.isExample; });
+    if (!examples.length) { showToast('Não há exemplos para remover.'); return; }
+    examples.forEach(function (t) { deleteTask(t.id); });
+  });
+
+  /* ---------- drag & drop (quadro estilo Trello) ---------- */
+
+  STATUS.forEach(function (status) {
+    var list = $('#list-' + status);
+    list.addEventListener('dragover', function (e) { e.preventDefault(); list.classList.add('drag-over'); });
+    list.addEventListener('dragleave', function () { list.classList.remove('drag-over'); });
+    list.addEventListener('drop', function (e) {
+      e.preventDefault();
+      list.classList.remove('drag-over');
+      var id = e.dataTransfer.getData('text/plain');
+      if (!id) return;
+      var t = state.tasks.find(function (x) { return x.id === id; });
+      if (!t || t.status === status) return;
+      saveTask(id, { status: status, updatedAt: new Date().toISOString() });
+    });
+  });
+
+  /* ---------- summary ---------- */
+
+  function buildSummaryText(from, to) {
+    var items = state.tasks.filter(function (t) {
+      if (t.status !== 'done' || !t.includeInReport) return false;
+      if (from && t.date < from) return false;
+      if (to && t.date > to) return false;
+      return true;
+    });
+    items.sort(function (a, b) { return (a.date || '').localeCompare(b.date || ''); });
+    if (!items.length) return 'Nenhuma entrega concluída e marcada para relatório nesse período.';
+
+    var groups = {}, order = [];
+    items.forEach(function (t) {
+      var cat = t.category || 'Outros';
+      if (!groups[cat]) { groups[cat] = []; order.push(cat); }
+      groups[cat].push(t);
+    });
+
+    var lines = [];
+    lines.push('Resumo de entregas (' + (from || 'início') + ' a ' + (to || 'hoje') + ')');
+    lines.push('');
+    order.forEach(function (cat) {
+      lines.push(cat.toUpperCase());
+      groups[cat].forEach(function (t) {
+        var line = '• [' + (t.priority || 'P2') + '] ' + fmtDateRange(t) + ' — ' + t.title;
+        if (t.description) line += ': ' + t.description;
+        lines.push(line);
+        (t.links || []).forEach(function (l) { lines.push('   ↳ ' + l.label + ': ' + l.url); });
+      });
+      lines.push('');
+    });
+    lines.push('Total: ' + items.length + ' entrega(s) concluída(s).');
+    return lines.join('\n');
+  }
+
+  function refreshSummary() {
+    $('#summary-text').textContent = buildSummaryText($('#sum-from').value, $('#sum-to').value);
+  }
+
+  function openSummary() {
+    var to = todayISO();
+    var fromDate = new Date();
+    fromDate.setDate(fromDate.getDate() - 7);
+    $('#sum-from').value = fromDate.toISOString().slice(0, 10);
+    $('#sum-to').value = to;
+    refreshSummary();
+    $('#summary-overlay').hidden = false;
+  }
+  $('#btn-summary').addEventListener('click', openSummary);
+  $('#btn-summary-dash').addEventListener('click', openSummary);
+  $('#summary-close').addEventListener('click', function () { $('#summary-overlay').hidden = true; });
+  $('#summary-overlay').addEventListener('click', function (e) { if (e.target === $('#summary-overlay')) $('#summary-overlay').hidden = true; });
+  $('#btn-refresh-summary').addEventListener('click', refreshSummary);
+
+  $('#btn-copy-summary').addEventListener('click', function () {
+    var text = $('#summary-text').textContent;
+    function fallbackCopy() {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); showToast('Texto copiado.'); }
+      catch (e) { showToast('Não foi possível copiar automaticamente.'); }
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { showToast('Texto copiado.'); }).catch(fallbackCopy);
+    } else {
+      fallbackCopy();
+    }
+  });
+
+  $('#btn-download-summary').addEventListener('click', function () {
+    if (!state.downloads) return;
+    var text = $('#summary-text').textContent;
+    state.downloads.save({ filename: 'resumo-entregas.txt', data: text })
+      .then(function () { showToast('Arquivo salvo.'); })
+      .catch(function (err) {
+        if (err && err.code === 'declined') return;
+        showToast('Não foi possível baixar o arquivo.');
+      });
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      if (!$('#modal-overlay').hidden) closeTaskModal();
+      if (!$('#summary-overlay').hidden) $('#summary-overlay').hidden = true;
+    }
+  });
+
+  /* ---------- boot ---------- */
+
+  function bootFromSnapshot(snap) {
+    state.tasks = snap.docs.map(function (d) {
+      return Object.assign({ id: d.id }, d.data() || {});
+    });
+    state.loaded = true;
+    renderBoard();
+  }
+
+  function boot() {
+    renderBoard();
+
+    if (!window.claude || !window.claude.use) {
+      state.loaded = true;
+      renderBoard();
+      showBanner('Esta página está sendo vista fora do Claude — o que você adicionar agora fica só nesta sessão do navegador, sem salvar.');
+      return;
+    }
+
+    window.claude.use('db').then(function (db) {
+      if (!db) {
+        state.loaded = true;
+        renderBoard();
+        showBanner('Este registro está sem conexão com o armazenamento agora — o que você adicionar fica só nesta sessão. Abra a página publicada pelo Claude para ativar o salvamento.');
+        return;
+      }
+      state.db = db;
+      db.collection('tasks').onSnapshot(bootFromSnapshot, function (err) {
+        showBanner('Não foi possível sincronizar os dados (' + ((err && err.code) || 'erro') + '). Suas alterações podem não ser salvas.');
+      });
+      db.collection('settings').doc('profile').get().then(function (snap) {
+        if (snap.exists) applyProfile(snap.data());
+      }).catch(function () {});
+    }).catch(function () {
+      state.loaded = true;
+      renderBoard();
+      showBanner('Não foi possível conectar ao armazenamento.');
+    });
+
+    window.claude.use('downloads').then(function (downloads) {
+      if (downloads) {
+        state.downloads = downloads;
+        $('#btn-download-summary').hidden = false;
+      }
+    }).catch(function () {});
+  }
+
+  boot();
+})();
+</script>
