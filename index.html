@@ -510,57 +510,6 @@
   .upcoming-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .upcoming-date { font-family: var(--font-mono); font-size: 11.5px; color: var(--text-muted); flex-shrink: 0; font-variant-numeric: tabular-nums; }
 
-  /* ---------- entry overlay ---------- */
-  .entry-overlay {
-    position: fixed;
-    inset: 0;
-    background: var(--rail-bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    z-index: 100;
-  }
-  .entry-card {
-    background: var(--surface);
-    border-radius: 10px;
-    padding: 36px 32px;
-    max-width: 360px;
-    width: 100%;
-    text-align: center;
-    box-shadow: var(--shadow);
-  }
-  .entry-mark {
-    width: 44px;
-    height: 44px;
-    border-radius: 8px;
-    background: var(--accent);
-    color: var(--accent-contrast);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 17px;
-    margin: 0 auto 18px auto;
-  }
-  .entry-card h2 { font-family: var(--font-display); font-size: 20px; font-weight: 700; margin: 0 0 4px 0; color: var(--text); letter-spacing: 0.02em; }
-  .entry-tagline { margin: 0 0 22px 0; color: var(--text-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; }
-  .entry-note { margin: 14px 0 0 0; color: var(--text-muted); font-size: 11.5px; line-height: 1.5; text-align: left; }
-  .entry-card input {
-    width: 100%;
-    font-family: var(--font-body);
-    font-size: 14.5px;
-    padding: 11px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text);
-    margin-bottom: 14px;
-    text-align: center;
-  }
-  .entry-card .btn { width: 100%; }
-
   /* ---------- profile ---------- */
   .profile-card {
     background: var(--surface);
@@ -616,19 +565,6 @@
     } catch (e) {}
   })();
 </script>
-
-<div class="entry-overlay" id="entry-overlay">
-  <div class="entry-card">
-    <div class="entry-mark" aria-hidden="true">P</div>
-    <h2>P STUDIO</h2>
-    <p class="entry-tagline">Creative Company</p>
-    <input id="entry-name" placeholder="Nome" autocomplete="off">
-    <input id="entry-email" type="email" placeholder="E-mail" autocomplete="off">
-    <input id="entry-password" type="password" placeholder="Senha" autocomplete="off">
-    <button id="btn-entry-submit" class="btn btn-primary" type="button">Entrar</button>
-    <p class="entry-note">Este acesso é só a porta de entrada do seu sistema — não existe servidor validando a senha. A senha não é salva em nenhum lugar; quem protege este link é o compartilhamento do Claude, que só você controla.</p>
-  </div>
-</div>
 
 <div class="shell">
   <nav class="rail" aria-label="Navegação principal">
@@ -1007,10 +943,6 @@
 
   function applyProfile(data) {
     state.profile = { name: (data && data.name) || '', email: (data && data.email) || '' };
-    if (!$('#entry-overlay').hidden) {
-      if (state.profile.name) $('#entry-name').value = state.profile.name;
-      if (state.profile.email) $('#entry-email').value = state.profile.email;
-    }
     if ($('#view-profile') && !$('#view-profile').hidden) {
       $('#profile-name').value = state.profile.name;
       $('#profile-email').value = state.profile.email;
@@ -1039,29 +971,11 @@
     showToast('Perfil salvo.');
   });
 
-  /* ---------- entry overlay ---------- */
-  /* A senha existe só para dar a sensação de login do sistema — nunca é lida além
-     deste clique, nunca é salva (nem no navegador, nem no banco de dados) e nunca
-     é validada contra nada, porque não existe backend de autenticação aqui. */
+  /* ---------- perfil salvo localmente (sem tela de login) ---------- */
 
-  function dismissEntry() {
-    var name = $('#entry-name').value.trim();
-    var email = $('#entry-email').value.trim();
-    $('#entry-password').value = '';
-    if (name || email) saveProfile(name, email);
-    $('#entry-overlay').hidden = true;
-  }
-  $('#btn-entry-submit').addEventListener('click', dismissEntry);
-  ['entry-name', 'entry-email', 'entry-password'].forEach(function (id) {
-    $('#' + id).addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') { e.preventDefault(); dismissEntry(); }
-    });
-  });
   try {
     var savedName = localStorage.getItem('ps_profile_name');
     var savedEmail = localStorage.getItem('ps_profile_email');
-    if (savedName) $('#entry-name').value = savedName;
-    if (savedEmail) $('#entry-email').value = savedEmail;
     if (savedName || savedEmail) state.profile = { name: savedName || '', email: savedEmail || '' };
   } catch (e) {}
 
