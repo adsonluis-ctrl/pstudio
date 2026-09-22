@@ -1,14 +1,15 @@
 <title>P Studio</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
   :root {
     --bg: #FFFFFF;
     --surface: #FFFFFF;
-    --surface-2: #F0F0F2;
-    --border: #E3E4E7;
-    --text: #0A0A0A;
-    --text-muted: #5B5F66;
+    --surface-2: #EEF2F8;
+    --border: #DEE3EC;
+    --text: #05132A;
+    --text-muted: #57627A;
     --accent: #195AB4;
+    --accent-2: #307AE0;
     --accent-contrast: #FFFFFF;
     --accent-soft: #E4EDF8;
     --status-todo: #8B93A6;
@@ -16,30 +17,49 @@
     --status-done: #1F8A5F;
     --danger: #C33F2E;
     --danger-soft: #F5DFDB;
-    --shadow: 0 8px 24px rgba(10, 10, 10, 0.10);
-    --shadow-sm: 0 1px 4px rgba(10, 10, 10, 0.07);
+    --shadow: 0 8px 24px rgba(5, 19, 42, 0.10);
+    --shadow-sm: 0 1px 4px rgba(5, 19, 42, 0.08);
+    --radius-sm: 4px;
+    --radius: 8px;
+    --radius-lg: 12px;
 
-    --rail-bg: #000000;
-    --rail-text: #C9CBCE;
-    --rail-text-dim: #6B6E73;
-    --rail-active-bg: rgba(25, 90, 180, 0.20);
+    --rail-bg: #0B1A33;
+    --rail-text: #C7D2E3;
+    --rail-text-dim: #6E7C97;
+    --rail-active-bg: rgba(48, 122, 224, 0.22);
 
-    --font-display: 'IBM Plex Sans', Helvetica, Arial, sans-serif;
-    --font-body: 'IBM Plex Sans', Helvetica, Arial, sans-serif;
+    --board-bg: linear-gradient(160deg, #195AB4 0%, #12417F 100%);
+    --list-bg: #F4F6FA;
+
+    --glass-bg: rgba(255, 255, 255, 0.78);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --rail-glass-1: rgba(22, 41, 71, 0.82);
+    --rail-glass-2: rgba(9, 20, 39, 0.9);
+
+    --pending: #B8862E;
+    --pending-soft: #FBEFDB;
+    --approved: #1F8A5F;
+    --approved-soft: #DFF3E8;
+    --rejected: #C33F2E;
+    --rejected-soft: #F5DFDB;
+
+    --font-display: 'Inter', Helvetica, Arial, sans-serif;
+    --font-body: 'Inter', Helvetica, Arial, sans-serif;
     --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
   }
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #0A0A0C;
-      --surface: #131417;
-      --surface-2: #1B1D21;
-      --border: #2A2C31;
-      --text: #F2F3F4;
-      --text-muted: #9A9DA3;
-      --accent: #4C8DDE;
-      --accent-contrast: #0A0A0C;
-      --accent-soft: #172234;
+      --bg: #070D18;
+      --surface: #101828;
+      --surface-2: #182236;
+      --border: #283651;
+      --text: #EEF2F8;
+      --text-muted: #9AA6C0;
+      --accent: #5B9BEE;
+      --accent-2: #7CB2F5;
+      --accent-contrast: #061024;
+      --accent-soft: #16283F;
       --status-todo: #8B93A6;
       --status-doing: #D9A544;
       --status-done: #35B583;
@@ -47,20 +67,31 @@
       --danger-soft: #2E1B16;
       --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
       --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
-      --rail-active-bg: rgba(76, 141, 222, 0.24);
+      --rail-active-bg: rgba(91, 155, 238, 0.24);
+      --board-bg: linear-gradient(160deg, #0E2B54 0%, #060F1F 100%);
+      --list-bg: #101828;
+      --glass-bg: rgba(16, 24, 40, 0.62);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --pending: #D9A544;
+      --pending-soft: #332711;
+      --approved: #35B583;
+      --approved-soft: #113023;
+      --rejected: #E0674B;
+      --rejected-soft: #2E1B16;
     }
   }
 
   :root[data-theme="dark"] {
-    --bg: #0A0A0C;
-    --surface: #131417;
-    --surface-2: #1B1D21;
-    --border: #2A2C31;
-    --text: #F2F3F4;
-    --text-muted: #9A9DA3;
-    --accent: #4C8DDE;
-    --accent-contrast: #0A0A0C;
-    --accent-soft: #172234;
+    --bg: #070D18;
+    --surface: #101828;
+    --surface-2: #182236;
+    --border: #283651;
+    --text: #EEF2F8;
+    --text-muted: #9AA6C0;
+    --accent: #5B9BEE;
+    --accent-2: #7CB2F5;
+    --accent-contrast: #061024;
+    --accent-soft: #16283F;
     --status-todo: #8B93A6;
     --status-doing: #D9A544;
     --status-done: #35B583;
@@ -68,7 +99,17 @@
     --danger-soft: #2E1B16;
     --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
-    --rail-active-bg: rgba(76, 141, 222, 0.24);
+    --rail-active-bg: rgba(91, 155, 238, 0.24);
+    --board-bg: linear-gradient(160deg, #0E2B54 0%, #060F1F 100%);
+    --list-bg: #101828;
+    --glass-bg: rgba(16, 24, 40, 0.62);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --pending: #D9A544;
+    --pending-soft: #332711;
+    --approved: #35B583;
+    --approved-soft: #113023;
+    --rejected: #E0674B;
+    --rejected-soft: #2E1B16;
   }
 
   * { box-sizing: border-box; }
@@ -92,31 +133,53 @@
     }
   }
 
-  /* ---------- shell / rail ---------- */
+  /* ---------- shell / rail (sidebar lateral) ---------- */
   .shell {
     display: flex;
     align-items: flex-start;
-    max-width: 1180px;
+    max-width: 1280px;
     margin: 0 auto;
   }
   .rail {
     flex-shrink: 0;
-    width: 76px;
-    background: var(--rail-bg);
-    border-radius: 10px;
+    width: 220px;
+    background: linear-gradient(175deg, var(--rail-glass-1), var(--rail-glass-2));
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    backdrop-filter: blur(22px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 12px 32px rgba(5, 19, 42, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius);
     margin: 20px 0 20px 12px;
-    padding-block: 16px;
+    padding: 16px 12px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 6px;
+    align-items: stretch;
+    gap: 3px;
     position: sticky;
     top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    transition: width 0.18s ease;
+    user-select: none;
+  }
+  .rail-hint {
+    font-size: 10px;
+    color: var(--rail-text-dim);
+    text-align: center;
+    padding: 2px 4px 10px 4px;
+    letter-spacing: 0.02em;
+  }
+  .rail-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 2px 4px 14px 4px;
   }
   .rail-mark {
-    width: 34px;
-    height: 34px;
-    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border-radius: var(--radius-sm);
     background: var(--accent);
     color: var(--accent-contrast);
     font-family: var(--font-display);
@@ -125,45 +188,124 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 12px;
+  }
+  .rail-brand {
+    color: #fff;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 14.5px;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .rail-brand span {
+    display: block;
+    color: var(--rail-text-dim);
+    font-weight: 400;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
   }
   .rail-btn {
     background: transparent;
     border: none;
     color: var(--rail-text);
     cursor: pointer;
-    width: 58px;
-    padding: 8px 4px 7px 4px;
-    border-radius: 10px;
+    width: 100%;
+    padding: 9px 10px;
+    border-radius: var(--radius-sm);
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 4px;
-    font-size: 10.5px;
+    gap: 11px;
+    font-size: 13.5px;
+    font-weight: 500;
     font-family: var(--font-body);
+    text-align: left;
+    white-space: nowrap;
+    position: relative;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.08s ease;
   }
-  .rail-btn svg { width: 19px; height: 19px; }
-  .rail-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
-  .rail-btn.primary, .rail-btn.active { background: var(--rail-active-bg); color: var(--accent); }
-  .rail-btn.primary:hover, .rail-btn.active:hover { background: var(--rail-active-bg); color: var(--accent); }
+  .rail-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .rail-btn-label { overflow: hidden; text-overflow: ellipsis; }
+  .rail-btn:hover { background: rgba(255,255,255,0.09); color: #fff; }
+  .rail-btn:active { transform: scale(0.97); }
+  .rail-btn.primary, .rail-btn.active {
+    background: linear-gradient(135deg, rgba(48,122,224,0.42), rgba(48,122,224,0.20));
+    color: #fff;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), inset 0 0 0 1px rgba(124,178,245,0.25);
+  }
+  .rail-btn.primary:hover, .rail-btn.active:hover { filter: brightness(1.08); }
   .rail-spacer { flex: 1; }
   .rail-btn.ghost { color: var(--rail-text-dim); }
   .rail-btn.ghost:hover { color: var(--rail-text); }
+  .rail-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 8px 6px; }
+  .rail-badge {
+    margin-left: auto;
+    background: var(--danger);
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    flex-shrink: 0;
+  }
+  .rail.collapsed .rail-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    margin-left: 0;
+  }
+
+  /* colapsado: ícone apenas, largura reduzida */
+  .rail.collapsed { width: 68px; }
+  .rail.collapsed .rail-top { justify-content: center; padding: 2px 0 14px 0; }
+  .rail.collapsed .rail-brand { display: none; }
+  .rail.collapsed .rail-hint { display: none; }
+  .rail.collapsed .rail-btn { justify-content: center; padding: 10px 6px; }
+  .rail.collapsed .rail-btn-label { display: none; }
 
   @media (max-width: 760px) {
     .shell { flex-direction: column; }
+    .content { padding-bottom: 92px; }
     .rail {
-      width: auto;
+      width: auto !important;
+      max-width: none;
+      margin: 0;
+      padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px)) 6px;
+      position: fixed;
+      left: 8px;
+      right: 8px;
+      bottom: 8px;
+      top: auto;
+      max-height: none;
       flex-direction: row;
-      margin: 12px 12px 0 12px;
-      position: static;
-      padding: 10px 12px;
-      gap: 4px;
+      align-items: center;
+      gap: 2px;
+      z-index: 40;
+      border-radius: 18px;
+      overflow-x: auto;
+      overflow-y: visible;
     }
-    .rail-mark { margin: 0 8px 0 0; }
+    .rail-top, .rail-hint, .rail-divider { display: none; }
     .rail-spacer { display: none; }
-    .rail-btn { width: auto; flex-direction: row; padding: 8px 10px; font-size: 12px; }
-    .rail-btn svg { width: 16px; height: 16px; }
+    .rail-btn {
+      flex-direction: column;
+      gap: 2px;
+      padding: 7px 8px;
+      font-size: 9.5px;
+      flex: 1 0 auto;
+    }
+    .rail-btn-label { max-width: 54px; text-overflow: ellipsis; }
+    .rail.collapsed { width: auto; }
+    .rail.collapsed .rail-btn-label { display: block; }
+    .rail-badge, .rail.collapsed .rail-badge { position: absolute; top: 2px; right: 10px; margin-left: 0; }
   }
 
   .content {
@@ -176,11 +318,11 @@
   .topbar { margin-bottom: 22px; }
   .topbar h1 {
     font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: 500;
     font-size: clamp(28px, 4vw, 38px);
     margin: 0 0 6px 0;
     text-wrap: balance;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
   }
   .topbar-tagline { font-family: var(--font-body); font-weight: 400; color: var(--text-muted); font-size: 0.55em; letter-spacing: 0.02em; }
   .topbar .subtitle {
@@ -195,7 +337,7 @@
     font-family: var(--font-body);
     font-weight: 500;
     font-size: 14px;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     padding: 10px 16px;
     border: 1px solid transparent;
     cursor: pointer;
@@ -246,7 +388,7 @@
     font-family: var(--font-body);
     font-size: 14px;
     padding: 9px 12px;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     border: 1px solid var(--border);
     background: var(--surface);
     color: var(--text);
@@ -261,27 +403,36 @@
     white-space: nowrap;
   }
 
-  /* ---------- board ---------- */
-  .board {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
+  /* ---------- board (estilo Trello) ---------- */
+  .board-frame {
+    background: var(--board-bg);
+    border-radius: var(--radius-lg);
+    padding: 18px;
   }
-  @media (max-width: 760px) {
-    .board { grid-template-columns: 1fr; }
+  .board {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    overflow-x: auto;
+    padding-bottom: 6px;
   }
   .column {
-    background: var(--surface-2);
-    border-radius: 8px;
-    padding: 14px;
-    min-height: 120px;
+    background: var(--list-bg);
+    border-radius: var(--radius);
+    padding: 10px 10px 8px 10px;
+    min-height: 60px;
+    flex: 0 0 272px;
+    width: 272px;
+    max-height: calc(100vh - 220px);
+    display: flex;
+    flex-direction: column;
   }
   .column-head {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 12px;
-    padding: 0 2px;
+    margin-bottom: 8px;
+    padding: 4px 6px;
   }
   .status-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
   .status-dot.todo { background: var(--status-todo); }
@@ -290,63 +441,110 @@
   .column-title {
     font-weight: 600;
     font-size: 13.5px;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    color: var(--text-muted);
+    letter-spacing: 0.01em;
+    color: var(--text);
   }
   .column-count {
     margin-left: auto;
     font-family: var(--font-mono);
-    font-size: 12.5px;
+    font-size: 12px;
     color: var(--text-muted);
     background: var(--surface);
     border-radius: 999px;
-    padding: 2px 8px;
+    padding: 1px 8px;
   }
-  .column-body { display: flex; flex-direction: column; gap: 10px; }
+  .column-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    padding: 2px;
+    min-height: 30px;
+  }
   .empty-hint { color: var(--text-muted); font-size: 13px; padding: 10px 4px; margin: 0; }
+
+  /* ---------- quick add ---------- */
+  .quick-add-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    font-weight: 500;
+    padding: 8px 6px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    margin-top: 2px;
+    width: 100%;
+    text-align: left;
+  }
+  .quick-add-btn:hover { background: rgba(5, 19, 42, 0.06); color: var(--text); }
+  .quick-add-form { padding: 2px 2px 0 2px; margin-top: 2px; }
+  .quick-add-form textarea {
+    width: 100%;
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    padding: 9px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    resize: none;
+    min-height: 52px;
+    box-shadow: var(--shadow-sm);
+  }
+  .quick-add-actions { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
 
   /* ---------- card ---------- */
   .card {
     background: var(--surface);
-    border-radius: 8px;
-    padding: 13px 14px;
+    border-radius: var(--radius);
+    padding: 10px 11px 9px 11px;
     box-shadow: var(--shadow-sm);
     cursor: pointer;
     border: 1px solid var(--border);
-    border-left: 4px solid var(--status-todo);
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
   }
-  .column[data-status="todo"] .card { border-left-color: var(--status-todo); }
-  .column[data-status="doing"] .card { border-left-color: var(--status-doing); }
-  .column[data-status="done"] .card { border-left-color: var(--status-done); }
-  .card:hover { box-shadow: var(--shadow); }
+  .card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+  .card-labels { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
+  .label-bar {
+    height: 7px;
+    width: 34px;
+    border-radius: 3px;
+  }
+  .label-bar.p1 { background: var(--danger); }
+  .label-bar.p2 { background: var(--accent); }
+  .label-bar.p3 { background: var(--status-todo); }
   .card-top { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 6px; }
   .chip {
     font-size: 11.5px;
     font-weight: 500;
     background: var(--accent-soft);
     color: var(--accent);
-    border-radius: 999px;
-    padding: 2px 9px;
+    border-radius: var(--radius-sm);
+    padding: 2px 8px;
   }
   .chip-example {
     background: transparent;
     color: var(--text-muted);
     border: 1px dashed var(--border);
   }
-  .chip-priority { font-size: 11px; font-weight: 600; border-radius: 999px; padding: 2px 8px; }
+  .chip-priority { font-size: 11px; font-weight: 600; border-radius: var(--radius-sm); padding: 2px 7px; }
   .chip-priority.p1 { background: var(--danger-soft); color: var(--danger); }
   .chip-priority.p2 { background: var(--accent-soft); color: var(--accent); }
   .chip-priority.p3 { background: var(--surface-2); color: var(--text-muted); }
   .card-title {
     font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 15.5px;
+    font-weight: 500;
+    font-size: 14.5px;
     margin: 0 0 4px 0;
     text-wrap: balance;
   }
   .card-desc {
-    font-size: 13px;
+    font-size: 12.5px;
     color: var(--text-muted);
     margin: 0 0 8px 0;
     display: -webkit-box;
@@ -363,9 +561,10 @@
     color: var(--text-muted);
     font-variant-numeric: tabular-nums;
   }
+  .card-meta-left { display: flex; gap: 8px; align-items: center; flex: 1; min-width: 0; }
   .avatar {
-    width: 19px;
-    height: 19px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     background: var(--accent-soft);
     color: var(--accent);
@@ -376,29 +575,130 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    margin-left: auto;
   }
   .meta-report { color: var(--accent); }
+  .card-badge { display: flex; align-items: center; gap: 3px; }
+  .card-badge svg { width: 13px; height: 13px; }
+  .member-stack { display: flex; align-items: center; margin-left: auto; }
+  .member-stack .avatar { margin-left: -6px; border: 2px solid var(--surface); }
+  .member-stack .avatar:first-child { margin-left: 0; }
+  .member-stack-more {
+    margin-left: -6px;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    color: var(--text-muted);
+    font-size: 9px;
+    font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid var(--surface);
+  }
+
+  /* ---------- tipo (tarefa/post) ---------- */
+  .type-toggle { display: flex; gap: 6px; }
+  .type-toggle button {
+    flex: 1;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 9px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .type-toggle button.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); font-weight: 600; }
+
+  /* ---------- seções extras do modal (tempo, membros, processo, comentários) ---------- */
+  .modal-section { border-top: 1px solid var(--border); padding-top: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .modal-section-title {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .modal-section-title svg { width: 14px; height: 14px; }
+  .modal-section-hint { font-size: 12.5px; color: var(--text-muted); margin: 0; }
+
+  .timer-row { display: flex; align-items: center; gap: 12px; }
+  .timer-display {
+    font-family: var(--font-mono);
+    font-size: 22px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+  .timer-btn {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--accent);
+    color: #fff;
+    flex-shrink: 0;
+    transition: transform 0.1s ease;
+  }
+  .timer-btn:active { transform: scale(0.93); }
+  .timer-btn.running { background: var(--danger); }
+  .timer-btn svg { width: 16px; height: 16px; }
+  .timer-total { font-size: 12px; color: var(--text-muted); }
+
+  .checklist-progress-row { display: flex; align-items: center; gap: 8px; }
+  .checklist-bar { flex: 1; height: 6px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+  .checklist-bar-fill { height: 100%; background: var(--status-done); border-radius: 999px; transition: width 0.2s ease; }
+  .checklist-count { font-family: var(--font-mono); font-size: 11.5px; color: var(--text-muted); flex-shrink: 0; }
+  .checklist-row { display: flex; align-items: center; gap: 8px; }
+  .checklist-row input[type="checkbox"] { flex-shrink: 0; width: 16px; height: 16px; }
+  .checklist-row input[type="text"] { flex: 1; }
+  .checklist-row.done input[type="text"] { text-decoration: line-through; color: var(--text-muted); }
+  .checklist-add-row { display: flex; gap: 6px; }
+  .checklist-add-row input { flex: 1; }
+
+  .comment-list { display: flex; flex-direction: column; gap: 10px; max-height: 220px; overflow-y: auto; }
+  .comment-item { background: var(--surface-2); border-radius: var(--radius-sm); padding: 8px 10px; }
+  .comment-item-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; }
+  .comment-author { font-size: 12.5px; font-weight: 600; color: var(--text); }
+  .comment-time { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); }
+  .comment-text { font-size: 13px; color: var(--text); margin: 0; white-space: pre-wrap; }
+  .comment-add-row { display: flex; gap: 6px; align-items: flex-start; }
+  .comment-add-row textarea { flex: 1; min-height: 40px; resize: vertical; }
 
   /* ---------- modal ---------- */
   .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(10, 10, 12, 0.55);
+    background: rgba(5, 10, 20, 0.45);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 20px;
     z-index: 50;
+    animation: overlayIn 0.16s ease;
   }
+  @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
   .modal {
-    background: var(--surface);
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    backdrop-filter: blur(24px) saturate(160%);
+    border: 1px solid var(--glass-border);
     border-radius: 10px;
     width: 100%;
     max-width: 480px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.4);
+    animation: modalIn 0.18s cubic-bezier(.2,.8,.2,1);
   }
+  @keyframes modalIn { from { opacity: 0; transform: translateY(6px) scale(0.98); } to { opacity: 1; transform: none; } }
   .modal-wide { max-width: 620px; }
   .modal-head {
     display: flex;
@@ -422,7 +722,7 @@
     font-family: var(--font-body);
     font-size: 14.5px;
     padding: 10px 12px;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     border: 1px solid var(--border);
     background: var(--bg);
     color: var(--text);
@@ -479,8 +779,9 @@
   .view-header { margin-bottom: 18px; }
   .view-header h2 {
     font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: 500;
     font-size: 22px;
+    letter-spacing: -0.01em;
     margin: 0 0 4px 0;
   }
   .view-header p { margin: 0; color: var(--text-muted); font-size: 14px; }
@@ -529,7 +830,7 @@
     font-family: var(--font-body);
     font-size: 14.5px;
     padding: 10px 12px;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     border: 1px solid var(--border);
     background: var(--bg);
     color: var(--text);
@@ -538,9 +839,134 @@
   .data-section { margin-top: 4px; padding-top: 14px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
   .data-section p { margin: 0; font-size: 12.5px; color: var(--text-muted); }
 
+  /* ---------- aprovação de posts ---------- */
+  .posts-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+  .pill-tabs { display: flex; gap: 6px; background: var(--surface-2); border-radius: 999px; padding: 3px; }
+  .pill-tab {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .pill-tab.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); font-weight: 600; }
+  .posts-toolbar-spacer { flex: 1; }
+  .bulk-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: var(--text);
+  }
+  .bulk-bar-spacer { flex: 1; }
+
+  .post-list { display: flex; flex-direction: column; gap: 10px; }
+  .post-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+  }
+  .post-row:hover { box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+  .post-row input[type="checkbox"] { width: 17px; height: 17px; flex-shrink: 0; }
+  .post-row-main { flex: 1; min-width: 0; }
+  .post-row-title { font-family: var(--font-display); font-weight: 500; font-size: 14.5px; margin: 0 0 3px 0; }
+  .post-row-meta { display: flex; gap: 10px; flex-wrap: wrap; font-size: 12px; color: var(--text-muted); align-items: center; }
+  .status-chip {
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 3px 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .status-chip.pending { background: var(--pending-soft); color: var(--pending); }
+  .status-chip.approved { background: var(--approved-soft); color: var(--approved); }
+  .status-chip.rejected { background: var(--rejected-soft); color: var(--rejected); }
+  .post-row-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .post-row-actions button { flex-shrink: 0; }
+  .status-chip.scheduled { background: var(--approved-soft); color: var(--approved); }
+  .status-chip.ig-error { background: var(--rejected-soft); color: var(--rejected); }
+
+  /* ---------- mídia do post / integração metricool ---------- */
+  .media-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+  .media-thumb {
+    position: relative;
+    width: 72px; height: 72px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+  .media-thumb img, .media-thumb video { width: 100%; height: 100%; object-fit: cover; }
+  .media-thumb button {
+    position: absolute; top: 2px; right: 2px;
+    background: rgba(5,19,42,0.65);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 18px; height: 18px;
+    font-size: 11px;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .media-upload-btn {
+    width: 72px; height: 72px;
+    border-radius: var(--radius-sm);
+    border: 1px dashed var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 20px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .media-upload-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .integration-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    max-width: 460px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .integration-status-row { display: flex; align-items: center; gap: 10px; }
+  .integration-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--status-todo); flex-shrink: 0; }
+  .integration-dot.on { background: var(--approved); }
+  .integration-brand-list { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+  .integration-brand-option {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 13.5px;
+  }
+  .integration-brand-option:hover { border-color: var(--accent); }
+  .integration-brand-option img { width: 22px; height: 22px; border-radius: 50%; }
+
   /* ---------- drag and drop ---------- */
   .card[draggable="true"] { cursor: grab; }
-  .column-body.drag-over { outline: 2px dashed var(--accent); outline-offset: -2px; border-radius: 6px; }
+  .card.dragging { opacity: 0.4; }
+  .column-body.drag-over { outline: 2px dashed var(--accent-2); outline-offset: -2px; border-radius: var(--radius-sm); background: var(--accent-soft); }
 
   /* ---------- toast ---------- */
   .toast {
@@ -568,34 +994,44 @@
 </script>
 
 <div class="shell">
-  <nav class="rail" aria-label="Navegação principal">
-    <div class="rail-mark" aria-hidden="true">P</div>
-    <button id="btn-new" class="rail-btn primary" type="button">
+  <nav class="rail" id="rail" aria-label="Navegação principal" title="Duplo clique para recolher/expandir">
+    <div class="rail-top">
+      <div class="rail-mark" aria-hidden="true">P</div>
+      <div class="rail-brand">P STUDIO<span>Creative Company</span></div>
+    </div>
+    <button id="btn-new" class="rail-btn primary" type="button" title="Novo">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-      Novo
+      <span class="rail-btn-label">Novo</span>
     </button>
-    <button id="nav-dashboard" class="rail-btn active" type="button" data-view="dashboard">
+    <div class="rail-divider"></div>
+    <button id="nav-dashboard" class="rail-btn active" type="button" data-view="dashboard" title="Início">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/></svg>
-      Início
+      <span class="rail-btn-label">Início</span>
     </button>
-    <button id="nav-board" class="rail-btn" type="button" data-view="board">
+    <button id="nav-board" class="rail-btn" type="button" data-view="board" title="Quadro">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/></svg>
-      Quadro
+      <span class="rail-btn-label">Quadro</span>
     </button>
-    <button id="nav-profile" class="rail-btn" type="button" data-view="profile">
+    <button id="nav-posts" class="rail-btn" type="button" data-view="posts" title="Posts">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 21v-4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v4"/><path d="M8 8h8M8 12h5"/></svg>
+      <span class="rail-btn-label">Posts</span>
+      <span class="rail-badge" id="badge-posts" hidden>0</span>
+    </button>
+    <button id="nav-profile" class="rail-btn" type="button" data-view="profile" title="Perfil">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
-      Perfil
+      <span class="rail-btn-label">Perfil</span>
     </button>
     <span class="rail-spacer"></span>
-    <button id="btn-theme" class="rail-btn ghost" type="button">
+    <button id="btn-summary" class="rail-btn" type="button" title="Resumo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a1 1 0 0 1 1 1v1h1a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h1V5a1 1 0 0 1 1-1z"/><path d="M9 12h6M9 16h4"/></svg>
+      <span class="rail-btn-label">Resumo</span>
+    </button>
+    <button id="btn-theme" class="rail-btn ghost" type="button" title="Tema">
       <svg id="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.5A9 9 0 1 1 11.5 3a7 7 0 0 0 9.5 9.5z"/></svg>
       <svg id="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" hidden><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-      <span id="theme-label">Tema</span>
+      <span class="rail-btn-label" id="theme-label">Tema</span>
     </button>
-    <button id="btn-summary" class="rail-btn" type="button">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a1 1 0 0 1 1 1v1h1a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h1V5a1 1 0 0 1 1-1z"/><path d="M9 12h6M9 16h4"/></svg>
-      Resumo
-    </button>
+    <div class="rail-hint">Duplo clique para recolher</div>
   </nav>
 
   <div class="content">
@@ -627,6 +1063,7 @@
           <p class="hint" style="margin-bottom:12px;">Registre o que você fez enquanto está fresco na memória.</p>
           <button id="btn-new-dash" class="btn btn-primary" style="width:100%;" type="button">+ Nova entrada</button>
           <button id="btn-summary-dash" class="btn btn-secondary" style="width:100%; margin-top:8px;" type="button">Gerar resumo</button>
+          <div id="dash-posts-nudge" class="banner" style="margin:12px 0 0 0; cursor:pointer;" hidden></div>
         </div>
       </div>
     </div>
@@ -638,20 +1075,50 @@
         <label class="checkbox-inline"><input type="checkbox" id="filter-report-only"> Só marcados p/ relatório</label>
       </section>
 
-      <main class="board" id="board">
-        <div class="column" data-status="todo">
-          <div class="column-head"><span class="status-dot todo"></span><span class="column-title">A Fazer</span><span class="column-count" id="count-todo">0</span></div>
-          <div class="column-body" id="list-todo"></div>
+      <div class="board-frame">
+        <main class="board" id="board">
+          <div class="column" data-status="todo">
+            <div class="column-head"><span class="status-dot todo"></span><span class="column-title">A Fazer</span><span class="column-count" id="count-todo">0</span></div>
+            <div class="column-body" id="list-todo"></div>
+            <div class="quick-add" data-status="todo"></div>
+          </div>
+          <div class="column" data-status="doing">
+            <div class="column-head"><span class="status-dot doing"></span><span class="column-title">Em Andamento</span><span class="column-count" id="count-doing">0</span></div>
+            <div class="column-body" id="list-doing"></div>
+            <div class="quick-add" data-status="doing"></div>
+          </div>
+          <div class="column" data-status="done">
+            <div class="column-head"><span class="status-dot done"></span><span class="column-title">Concluído</span><span class="column-count" id="count-done">0</span></div>
+            <div class="column-body" id="list-done"></div>
+            <div class="quick-add" data-status="done"></div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <div class="view" data-view="posts" id="view-posts" hidden>
+      <div class="view-header">
+        <h2>Aprovação de posts</h2>
+        <p>Defina um aprovador para cada post. A publicação automática real no Instagram exige uma conta comercial conectada à Meta — esta página não tem servidor, então marca o post como aprovado/agendado para você publicar; não publica sozinha.</p>
+      </div>
+      <div class="posts-toolbar">
+        <div class="pill-tabs" id="posts-tabs">
+          <button type="button" class="pill-tab active" data-filter="pending">Pendentes</button>
+          <button type="button" class="pill-tab" data-filter="approved">Aprovados</button>
+          <button type="button" class="pill-tab" data-filter="rejected">Rejeitados</button>
+          <button type="button" class="pill-tab" data-filter="all">Todos</button>
         </div>
-        <div class="column" data-status="doing">
-          <div class="column-head"><span class="status-dot doing"></span><span class="column-title">Em Andamento</span><span class="column-count" id="count-doing">0</span></div>
-          <div class="column-body" id="list-doing"></div>
-        </div>
-        <div class="column" data-status="done">
-          <div class="column-head"><span class="status-dot done"></span><span class="column-title">Concluído</span><span class="column-count" id="count-done">0</span></div>
-          <div class="column-body" id="list-done"></div>
-        </div>
-      </main>
+        <span class="posts-toolbar-spacer"></span>
+        <button id="btn-new-post" class="btn btn-primary btn-small" type="button">+ Novo post</button>
+      </div>
+      <div class="bulk-bar" id="posts-bulk-bar" hidden>
+        <label class="checkbox-inline"><input type="checkbox" id="posts-select-all"> Selecionar todos</label>
+        <span id="posts-selected-count">0 selecionado(s)</span>
+        <span class="bulk-bar-spacer"></span>
+        <button id="btn-bulk-approve" class="btn btn-primary btn-small" type="button">Aprovar selecionados</button>
+        <button id="btn-bulk-reject" class="btn btn-ghost btn-small" type="button">Rejeitar</button>
+      </div>
+      <div class="post-list" id="post-list"></div>
     </div>
 
     <div class="view" data-view="profile" id="view-profile" hidden>
@@ -673,9 +1140,23 @@
         </div>
         <button id="btn-save-profile" class="btn btn-primary" style="align-self:flex-start;" type="button">Salvar</button>
         <div class="data-section">
+          <p>Ative para receber um aviso do navegador quando um post for atribuído a você para aprovação (funciona enquanto esta aba estiver aberta).</p>
+          <button id="btn-enable-notif" class="btn btn-secondary btn-small" type="button">Ativar notificações do navegador</button>
+        </div>
+        <div class="data-section">
           <p>Os exemplos ilustrativos ficam marcados com a etiqueta "exemplo" nos cards do quadro.</p>
           <button id="btn-clear-examples" class="btn btn-ghost btn-small" type="button">Remover exemplos</button>
         </div>
+      </div>
+
+      <div class="integration-card" style="margin-top:16px;">
+        <div class="integration-status-row">
+          <span class="integration-dot" id="metricool-dot"></span>
+          <strong id="metricool-title">Instagram via Metricool</strong>
+        </div>
+        <p class="hint" id="metricool-desc">Conecte sua marca do Metricool para que posts aprovados no P Studio sejam agendados de verdade no Instagram.</p>
+        <button id="btn-connect-metricool" class="btn btn-secondary btn-small" style="align-self:flex-start;" type="button">Buscar marcas do Metricool</button>
+        <div class="integration-brand-list" id="metricool-brand-list"></div>
       </div>
     </div>
   </div>
@@ -688,6 +1169,13 @@
       <button class="icon-btn" id="modal-close" aria-label="Fechar">✕</button>
     </div>
     <form id="task-form">
+      <div>
+        <label>Tipo</label>
+        <div class="type-toggle" id="type-toggle">
+          <button type="button" class="active" data-type="task">Tarefa</button>
+          <button type="button" data-type="post">Post (redes sociais)</button>
+        </div>
+      </div>
       <div>
         <label for="f-title">Título</label>
         <input id="f-title" required>
@@ -732,9 +1220,86 @@
         </div>
       </div>
       <div>
-        <label for="f-desc">Descrição</label>
+        <label for="f-members">Membros (separados por vírgula)</label>
+        <input id="f-members" placeholder="ex: Adson, Fulano, Ciclana">
+      </div>
+      <div id="post-fields" hidden>
+        <div class="field-row">
+          <div>
+            <label for="f-approver">Aprovador do post</label>
+            <input id="f-approver" placeholder="Nome de quem precisa aprovar">
+          </div>
+          <div>
+            <label for="f-scheduled">Agendar publicação</label>
+            <input type="datetime-local" id="f-scheduled">
+          </div>
+        </div>
+        <div>
+          <label for="f-ig-type">Formato no Instagram</label>
+          <select id="f-ig-type">
+            <option value="POST">Post (foto/carrossel)</option>
+            <option value="REEL">Reel (vídeo)</option>
+            <option value="STORY">Story</option>
+          </select>
+        </div>
+        <p class="hint" id="post-integration-hint">Ao aprovar, o post é agendado de verdade no Instagram via Metricool (conecte em Perfil → Instagram/Metricool). O Instagram exige pelo menos uma imagem ou vídeo abaixo.</p>
+        <div>
+          <label>Mídia do post (imagem/vídeo)</label>
+          <div class="media-grid" id="media-grid"></div>
+          <input type="file" id="media-file-input" accept="image/*,video/*" hidden>
+        </div>
+        <div id="metricool-status-line" class="hint" hidden></div>
+      </div>
+      <div>
+        <label for="f-desc" id="f-desc-label">Descrição</label>
         <textarea id="f-desc" placeholder="O que foi feito, e o impacto disso"></textarea>
       </div>
+
+      <div class="modal-section" id="timer-section" hidden>
+        <div class="modal-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>
+          Tempo dedicado
+        </div>
+        <div class="timer-row">
+          <button type="button" id="btn-timer" class="timer-btn" aria-label="Iniciar cronômetro">
+            <svg id="timer-icon-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <svg id="timer-icon-pause" viewBox="0 0 24 24" fill="currentColor" hidden><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>
+          </button>
+          <div>
+            <div class="timer-display" id="timer-display">00:00:00</div>
+            <div class="timer-total" id="timer-hint">Clique para começar a cronometrar esta atividade.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Processo
+        </div>
+        <div class="checklist-progress-row" id="checklist-progress-row" hidden>
+          <div class="checklist-bar"><div class="checklist-bar-fill" id="checklist-bar-fill" style="width:0%;"></div></div>
+          <span class="checklist-count" id="checklist-count">0/0</span>
+        </div>
+        <div id="checklist-list"></div>
+        <div class="checklist-add-row">
+          <input type="text" id="checklist-new-item" placeholder="Adicionar etapa do processo…">
+          <button type="button" id="btn-add-checklist" class="btn btn-ghost btn-small">+ Adicionar</button>
+        </div>
+      </div>
+
+      <div class="modal-section" id="comments-section" hidden>
+        <div class="modal-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Comentários
+        </div>
+        <div class="comment-list" id="comment-list"></div>
+        <div class="comment-add-row">
+          <textarea id="comment-new-text" placeholder="Escreva um comentário…"></textarea>
+          <button type="button" id="btn-add-comment" class="btn btn-primary btn-small">Comentar</button>
+        </div>
+      </div>
+
       <div class="links-section">
         <label>Anexos (links do Google Drive)</label>
         <div id="links-list"></div>
@@ -789,9 +1354,16 @@
     db: null,
     downloads: null,
     editingId: null,
+    currentType: 'task',
     view: 'dashboard',
     profile: { name: '', email: '' },
-    filters: { q: '', category: '', reportOnly: false }
+    filters: { q: '', category: '', reportOnly: false },
+    postFilter: 'pending',
+    postSelection: {},
+    firstSnapshot: true,
+    assets: null,
+    mcp: null,
+    metricool: null
   };
 
   function $(sel, root) { return (root || document).querySelector(sel); }
@@ -824,6 +1396,66 @@
   function uid() { return Math.random().toString(36).slice(2, 10); }
 
   function errMsg(err) { return (err && err.message) ? err.message : 'erro desconhecido'; }
+
+  function taskType(t) { return (t && t.type) || 'task'; }
+  function nonPostTasks() { return state.tasks.filter(function (t) { return taskType(t) !== 'post'; }); }
+  function postTasks() { return state.tasks.filter(function (t) { return taskType(t) === 'post'; }); }
+
+  function isOverdue(t) {
+    if (t.status === 'done') return false;
+    var d = t.dateEnd || t.date;
+    return !!d && d < todayISO();
+  }
+
+  function fmtClock(totalSeconds) {
+    var s = Math.max(0, Math.floor(totalSeconds));
+    var h = Math.floor(s / 3600);
+    var m = Math.floor((s % 3600) / 60);
+    var sec = s % 60;
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+    return pad(h) + ':' + pad(m) + ':' + pad(sec);
+  }
+
+  function fmtDuration(totalSeconds) {
+    var s = Math.max(0, Math.floor(totalSeconds));
+    var h = Math.floor(s / 3600);
+    var m = Math.floor((s % 3600) / 60);
+    if (h > 0) return h + 'h ' + m + 'min';
+    if (m > 0) return m + 'min';
+    return s + 's';
+  }
+
+  function elapsedSeconds(t) {
+    var base = t.timeSpent || 0;
+    if (t.timerStartedAt) {
+      var started = new Date(t.timerStartedAt).getTime();
+      if (!isNaN(started)) base += Math.floor((Date.now() - started) / 1000);
+    }
+    return base;
+  }
+
+  function tzOffsetString(timeZone, date) {
+    try {
+      var dtf = new Intl.DateTimeFormat('en-US', { timeZone: timeZone, timeZoneName: 'shortOffset' });
+      var parts = dtf.formatToParts(date);
+      var tzPart = parts.find(function (p) { return p.type === 'timeZoneName'; });
+      var m = /GMT([+-]\d{1,2})(?::?(\d{2}))?/.exec(tzPart && tzPart.value || '');
+      if (!m) return '+00:00';
+      var sign = m[1][0] === '-' ? '-' : '+';
+      var hh = Math.abs(parseInt(m[1], 10));
+      var mm = m[2] || '00';
+      return sign + (hh < 10 ? '0' : '') + hh + ':' + mm;
+    } catch (e) { return '+00:00'; }
+  }
+
+  function fmtDateTime(iso) {
+    if (!iso) return '';
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    var datePart = d.toLocaleDateString('pt-BR');
+    var timePart = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    return datePart + ' às ' + timePart;
+  }
 
   var toastTimer = null;
   function showToast(msg) {
@@ -871,12 +1503,30 @@
   });
 
   updateThemeUI();
+  updateMetricoolUI();
+
+  /* ---------- sidebar (recolhe/expande com duplo clique) ---------- */
+
+  var railEl = $('#rail');
+  function setRailCollapsed(collapsed) {
+    railEl.classList.toggle('collapsed', collapsed);
+    try { localStorage.setItem('ps_rail_collapsed', collapsed ? '1' : '0'); } catch (e) {}
+  }
+  (function () {
+    try {
+      if (localStorage.getItem('ps_rail_collapsed') === '1') setRailCollapsed(true);
+    } catch (e) {}
+  })();
+  railEl.addEventListener('dblclick', function (e) {
+    if (e.target.closest('button')) return;
+    setRailCollapsed(!railEl.classList.contains('collapsed'));
+  });
 
   /* ---------- views ---------- */
 
   function setView(v) {
     state.view = v;
-    ['dashboard', 'board', 'profile'].forEach(function (name) {
+    ['dashboard', 'board', 'posts', 'profile'].forEach(function (name) {
       var el = document.getElementById('view-' + name);
       if (el) el.hidden = (name !== v);
     });
@@ -884,6 +1534,7 @@
       btn.classList.toggle('active', btn.dataset.view === v);
     });
     if (v === 'dashboard') renderDashboard();
+    if (v === 'posts') renderPosts();
     if (v === 'profile') {
       $('#profile-name').value = state.profile.name || '';
       $('#profile-avatar-preview').textContent = initials(state.profile.name);
@@ -903,12 +1554,13 @@
     var label = d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
     $('#dash-date').textContent = label.charAt(0).toUpperCase() + label.slice(1);
 
-    $('#stat-total').textContent = state.tasks.length;
-    $('#stat-todo').textContent = state.tasks.filter(function (t) { return t.status === 'todo'; }).length;
-    $('#stat-doing').textContent = state.tasks.filter(function (t) { return t.status === 'doing'; }).length;
-    $('#stat-done').textContent = state.tasks.filter(function (t) { return t.status === 'done'; }).length;
+    var dashTasks = nonPostTasks();
+    $('#stat-total').textContent = dashTasks.length;
+    $('#stat-todo').textContent = dashTasks.filter(function (t) { return t.status === 'todo'; }).length;
+    $('#stat-doing').textContent = dashTasks.filter(function (t) { return t.status === 'doing'; }).length;
+    $('#stat-done').textContent = dashTasks.filter(function (t) { return t.status === 'done'; }).length;
 
-    var upcoming = state.tasks
+    var upcoming = dashTasks
       .filter(function (t) { return t.status !== 'done'; })
       .sort(function (a, b) { return (a.date || '').localeCompare(b.date || ''); })
       .slice(0, 6);
@@ -938,7 +1590,17 @@
         wrap.appendChild(row);
       });
     }
+
+    var pending = postTasks().filter(function (t) { return (t.approvalStatus || 'pending') === 'pending'; }).length;
+    var nudge = $('#dash-posts-nudge');
+    if (pending > 0) {
+      nudge.hidden = false;
+      nudge.textContent = pending === 1 ? '1 post aguardando sua aprovação →' : (pending + ' posts aguardando aprovação →');
+    } else {
+      nudge.hidden = true;
+    }
   }
+  $('#dash-posts-nudge').addEventListener('click', function () { setView('posts'); });
 
   /* ---------- profile ---------- */
 
@@ -1035,7 +1697,7 @@
         return;
       }
 
-      var items = state.tasks.filter(function (t) { return t.status === status; }).filter(matchesFilters);
+      var items = state.tasks.filter(function (t) { return t.status === status && taskType(t) !== 'post'; }).filter(matchesFilters);
       items.sort(function (a, b) { return (a.date || '').localeCompare(b.date || ''); });
       $('#count-' + status).textContent = items.length;
 
@@ -1049,6 +1711,8 @@
       items.forEach(function (t) { list.appendChild(buildCard(t)); });
     });
     renderDashboard();
+    updatePostsBadge();
+    if (state.view === 'posts') renderPosts();
   }
 
   function buildCard(t) {
@@ -1061,8 +1725,18 @@
       card.addEventListener('dragstart', function (e) {
         e.dataTransfer.setData('text/plain', t.id);
         e.dataTransfer.effectAllowed = 'move';
+        card.classList.add('dragging');
       });
+      card.addEventListener('dragend', function () { card.classList.remove('dragging'); });
     }
+
+    var labels = document.createElement('div');
+    labels.className = 'card-labels';
+    var bar = document.createElement('span');
+    bar.className = 'label-bar ' + (t.priority || 'P2').toLowerCase();
+    bar.title = PRIORITY_LABEL[t.priority] || PRIORITY_LABEL.P2;
+    labels.appendChild(bar);
+    card.appendChild(labels);
 
     var top = document.createElement('div');
     top.className = 'card-top';
@@ -1098,27 +1772,68 @@
 
     var meta = document.createElement('div');
     meta.className = 'card-meta';
-    var av = document.createElement('span');
-    av.className = 'avatar';
-    av.textContent = initials(t.assignee);
-    av.title = t.assignee || '';
-    meta.appendChild(av);
+    var metaLeft = document.createElement('span');
+    metaLeft.className = 'card-meta-left';
     if (t.date) {
       var d = document.createElement('span');
       d.textContent = fmtDateRange(t);
-      meta.appendChild(d);
+      if (isOverdue(t)) { d.style.color = 'var(--danger)'; d.style.fontWeight = '600'; d.title = 'Atrasada'; }
+      metaLeft.appendChild(d);
     }
     if (t.links && t.links.length) {
       var l = document.createElement('span');
       l.textContent = '📎 ' + t.links.length;
-      meta.appendChild(l);
+      metaLeft.appendChild(l);
+    }
+    var checklist = t.checklist || [];
+    if (checklist.length) {
+      var doneCount = checklist.filter(function (c) { return c.done; }).length;
+      var cl = document.createElement('span');
+      cl.className = 'card-badge';
+      cl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>' + doneCount + '/' + checklist.length;
+      metaLeft.appendChild(cl);
+    }
+    if (t.comments && t.comments.length) {
+      var cm = document.createElement('span');
+      cm.className = 'card-badge';
+      cm.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' + t.comments.length;
+      metaLeft.appendChild(cm);
+    }
+    var timeVal = elapsedSeconds(t);
+    if (timeVal > 0) {
+      var tm = document.createElement('span');
+      tm.className = 'card-badge';
+      tm.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>' + fmtDuration(timeVal);
+      if (t.timerStartedAt) { tm.style.color = 'var(--danger)'; tm.title = 'Cronômetro rodando'; }
+      metaLeft.appendChild(tm);
     }
     if (t.includeInReport) {
       var r = document.createElement('span');
       r.className = 'meta-report';
       r.textContent = '✓ relatório';
-      meta.appendChild(r);
+      metaLeft.appendChild(r);
     }
+    meta.appendChild(metaLeft);
+
+    var memberNames = [t.assignee].concat(t.members || []).filter(function (n, i, arr) {
+      return n && arr.indexOf(n) === i;
+    });
+    var stack = document.createElement('span');
+    stack.className = 'member-stack';
+    memberNames.slice(0, 3).forEach(function (name) {
+      var m = document.createElement('span');
+      m.className = 'avatar';
+      m.textContent = initials(name);
+      m.title = name;
+      stack.appendChild(m);
+    });
+    if (memberNames.length > 3) {
+      var more = document.createElement('span');
+      more.className = 'member-stack-more';
+      more.textContent = '+' + (memberNames.length - 3);
+      stack.appendChild(more);
+    }
+    meta.appendChild(stack);
     card.appendChild(meta);
 
     function open() { openTaskModal(t.id); }
@@ -1130,25 +1845,125 @@
     return card;
   }
 
+  /* ---------- adicionar cartão rápido (estilo Trello) ---------- */
+
+  function renderQuickAddButton(container, status) {
+    container.innerHTML = '';
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'quick-add-btn';
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Adicionar cartão';
+    btn.addEventListener('click', function () { renderQuickAddForm(container, status); });
+    container.appendChild(btn);
+  }
+
+  function renderQuickAddForm(container, status) {
+    container.innerHTML = '';
+    var form = document.createElement('div');
+    form.className = 'quick-add-form';
+    var ta = document.createElement('textarea');
+    ta.placeholder = 'Título do cartão…';
+    form.appendChild(ta);
+    var actions = document.createElement('div');
+    actions.className = 'quick-add-actions';
+    var addBtn = document.createElement('button');
+    addBtn.type = 'button'; addBtn.className = 'btn btn-primary btn-small'; addBtn.textContent = 'Adicionar cartão';
+    var cancelBtn = document.createElement('button');
+    cancelBtn.type = 'button'; cancelBtn.className = 'icon-btn'; cancelBtn.setAttribute('aria-label', 'Cancelar'); cancelBtn.textContent = '✕';
+    actions.appendChild(addBtn); actions.appendChild(cancelBtn);
+    form.appendChild(actions);
+    container.appendChild(form);
+    ta.focus();
+
+    function submit() {
+      var title = ta.value.trim();
+      if (!title) { renderQuickAddButton(container, status); return; }
+      saveTask(null, {
+        title: title,
+        status: status,
+        priority: 'P2',
+        category: '',
+        assignee: state.profile.name || 'Eu',
+        date: todayISO(),
+        dateEnd: '',
+        description: '',
+        includeInReport: true,
+        links: [],
+        updatedAt: new Date().toISOString()
+      });
+      renderQuickAddForm(container, status);
+    }
+    addBtn.addEventListener('click', submit);
+    cancelBtn.addEventListener('click', function () { renderQuickAddButton(container, status); });
+    ta.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); }
+      if (e.key === 'Escape') { e.preventDefault(); renderQuickAddButton(container, status); }
+    });
+  }
+
+  STATUS.forEach(function (status) {
+    var container = $('.quick-add[data-status="' + status + '"]');
+    if (container) renderQuickAddButton(container, status);
+  });
+
   /* ---------- task modal ---------- */
 
   var linkRows = [];
+  var checklistRows = [];
 
-  function openTaskModal(id) {
+  function setModalType(type) {
+    state.currentType = type;
+    $all('#type-toggle button').forEach(function (b) {
+      b.classList.toggle('active', b.dataset.type === type);
+    });
+    $('#post-fields').hidden = type !== 'post';
+    $('#f-desc-label').textContent = type === 'post' ? 'Legenda / conteúdo do post' : 'Descrição';
+    $('#f-desc').placeholder = type === 'post' ? 'O texto/legenda que vai junto com o post' : 'O que foi feito, e o impacto disso';
+  }
+
+  $all('#type-toggle button').forEach(function (b) {
+    b.addEventListener('click', function () { setModalType(b.dataset.type); });
+  });
+
+  function openTaskModal(id, presetType) {
     state.editingId = id || null;
     var t = id ? state.tasks.find(function (x) { return x.id === id; }) : null;
-    $('#modal-title').textContent = t ? 'Editar entrada' : 'Nova entrada';
+    var type = t ? taskType(t) : (presetType || 'task');
+    setModalType(type);
+    $('#modal-title').textContent = t ? (type === 'post' ? 'Editar post' : 'Editar entrada') : (type === 'post' ? 'Novo post' : 'Nova entrada');
     $('#f-title').value = t ? (t.title || '') : '';
     $('#f-status').value = t ? t.status : 'todo';
     $('#f-priority').value = t ? (t.priority || 'P2') : 'P2';
     $('#f-category').value = t ? (t.category || '') : '';
     $('#f-assignee').value = t ? (t.assignee || '') : (state.profile.name || 'Eu');
+    $('#f-members').value = t && t.members ? t.members.join(', ') : '';
+    $('#f-approver').value = t ? (t.approver || '') : '';
+    $('#f-scheduled').value = t ? (t.scheduledAt || '') : '';
+    $('#f-ig-type').value = t ? (t.igType || 'POST') : 'POST';
     $('#f-date').value = t ? (t.date || '') : todayISO();
     $('#f-date-end').value = t ? (t.dateEnd || '') : '';
     $('#f-desc').value = t ? (t.description || '') : '';
     $('#f-report').checked = t ? !!t.includeInReport : true;
     linkRows = (t && t.links) ? t.links.map(function (l) { return { label: l.label || '', url: l.url || '' }; }) : [];
     renderLinkRows();
+    checklistRows = (t && t.checklist) ? t.checklist.map(function (c) { return { text: c.text || '', done: !!c.done }; }) : [];
+    renderChecklist();
+    mediaRows = (t && t.media) ? t.media.map(function (m) { return { id: m.id, url: m.url, contentType: m.contentType }; }) : [];
+    renderMediaGrid();
+    updateMetricoolStatusLine(t);
+
+    if (t) {
+      $('#comments-section').hidden = false;
+      renderComments(t);
+      $('#timer-section').hidden = false;
+      updateTimerDisplay();
+    } else {
+      $('#comments-section').hidden = true;
+      $('#timer-section').hidden = true;
+    }
+    stopTimerTick();
+    if (t && t.timerStartedAt) startTimerTick();
+
     $('#btn-delete').hidden = !t;
     $('#modal-overlay').hidden = false;
     $('#f-title').focus();
@@ -1157,7 +1972,198 @@
   function closeTaskModal() {
     $('#modal-overlay').hidden = true;
     state.editingId = null;
+    stopTimerTick();
   }
+
+  /* ---------- processo (checklist) ---------- */
+
+  function renderChecklist() {
+    var wrap = $('#checklist-list');
+    wrap.innerHTML = '';
+    checklistRows.forEach(function (item, idx) {
+      var row = document.createElement('div');
+      row.className = 'checklist-row' + (item.done ? ' done' : '');
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = item.done;
+      cb.addEventListener('change', function () { item.done = cb.checked; renderChecklist(); });
+      var txt = document.createElement('input');
+      txt.type = 'text';
+      txt.value = item.text;
+      txt.addEventListener('input', function () { item.text = txt.value; });
+      var rm = document.createElement('button');
+      rm.type = 'button'; rm.className = 'icon-btn'; rm.setAttribute('aria-label', 'Remover etapa'); rm.textContent = '✕';
+      rm.addEventListener('click', function () { checklistRows.splice(idx, 1); renderChecklist(); });
+      row.appendChild(cb); row.appendChild(txt); row.appendChild(rm);
+      wrap.appendChild(row);
+    });
+    var progressRow = $('#checklist-progress-row');
+    if (checklistRows.length) {
+      var done = checklistRows.filter(function (c) { return c.done; }).length;
+      progressRow.hidden = false;
+      $('#checklist-count').textContent = done + '/' + checklistRows.length;
+      $('#checklist-bar-fill').style.width = (checklistRows.length ? Math.round(100 * done / checklistRows.length) : 0) + '%';
+    } else {
+      progressRow.hidden = true;
+    }
+  }
+
+  function addChecklistItem() {
+    var input = $('#checklist-new-item');
+    var text = input.value.trim();
+    if (!text) return;
+    checklistRows.push({ text: text, done: false });
+    input.value = '';
+    renderChecklist();
+    input.focus();
+  }
+  $('#btn-add-checklist').addEventListener('click', addChecklistItem);
+  $('#checklist-new-item').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); addChecklistItem(); }
+  });
+
+  /* ---------- mídia do post ---------- */
+
+  var mediaRows = [];
+
+  function renderMediaGrid() {
+    var grid = $('#media-grid');
+    grid.innerHTML = '';
+    mediaRows.forEach(function (m, idx) {
+      var thumb = document.createElement('div');
+      thumb.className = 'media-thumb';
+      if ((m.contentType || '').indexOf('video') === 0) {
+        var v = document.createElement('video');
+        v.src = m.url; v.muted = true;
+        thumb.appendChild(v);
+      } else {
+        var img = document.createElement('img');
+        img.src = m.url; img.alt = '';
+        thumb.appendChild(img);
+      }
+      var rm = document.createElement('button');
+      rm.type = 'button'; rm.setAttribute('aria-label', 'Remover mídia'); rm.textContent = '✕';
+      rm.addEventListener('click', function () { mediaRows.splice(idx, 1); renderMediaGrid(); });
+      thumb.appendChild(rm);
+      grid.appendChild(thumb);
+    });
+    var addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'media-upload-btn';
+    addBtn.setAttribute('aria-label', 'Adicionar mídia');
+    addBtn.textContent = '+';
+    addBtn.addEventListener('click', function () {
+      if (!state.assets) { showToast('Conecte-se pelo link publicado do Claude para enviar mídia.'); return; }
+      $('#media-file-input').click();
+    });
+    grid.appendChild(addBtn);
+  }
+
+  $('#media-file-input').addEventListener('change', function () {
+    var file = this.files && this.files[0];
+    this.value = '';
+    if (!file || !state.assets) return;
+    showToast('Enviando mídia…');
+    state.assets.upload(file).then(function (res) {
+      mediaRows.push({ id: res.id, url: res.url, contentType: res.contentType });
+      renderMediaGrid();
+      showToast('Mídia adicionada.');
+    }).catch(function () {
+      showToast('Não foi possível enviar a mídia.');
+    });
+  });
+
+  /* ---------- comentários ---------- */
+
+  function renderComments(t) {
+    var wrap = $('#comment-list');
+    wrap.innerHTML = '';
+    var comments = (t.comments || []).slice().reverse();
+    if (!comments.length) {
+      var p = document.createElement('p');
+      p.className = 'modal-section-hint';
+      p.textContent = 'Nenhum comentário ainda.';
+      wrap.appendChild(p);
+      return;
+    }
+    comments.forEach(function (c) {
+      var item = document.createElement('div');
+      item.className = 'comment-item';
+      var head = document.createElement('div');
+      head.className = 'comment-item-head';
+      var author = document.createElement('span');
+      author.className = 'comment-author';
+      author.textContent = c.author || 'Alguém';
+      var time = document.createElement('span');
+      time.className = 'comment-time';
+      time.textContent = fmtDateTime(c.at);
+      head.appendChild(author); head.appendChild(time);
+      var text = document.createElement('p');
+      text.className = 'comment-text';
+      text.textContent = c.text || '';
+      item.appendChild(head); item.appendChild(text);
+      wrap.appendChild(item);
+    });
+  }
+
+  $('#btn-add-comment').addEventListener('click', function () {
+    var id = state.editingId;
+    if (!id) return;
+    var input = $('#comment-new-text');
+    var text = input.value.trim();
+    if (!text) return;
+    var t = state.tasks.find(function (x) { return x.id === id; });
+    if (!t) return;
+    var comment = { author: state.profile.name || 'Eu', text: text, at: new Date().toISOString() };
+    t.comments = (t.comments || []).concat([comment]);
+    saveTask(id, { comments: t.comments });
+    input.value = '';
+    renderComments(t);
+  });
+
+  /* ---------- cronômetro ---------- */
+
+  var timerTickHandle = null;
+
+  function updateTimerDisplay() {
+    var id = state.editingId;
+    if (!id) return;
+    var t = state.tasks.find(function (x) { return x.id === id; });
+    if (!t) return;
+    $('#timer-display').textContent = fmtClock(elapsedSeconds(t));
+    var running = !!t.timerStartedAt;
+    $('#btn-timer').classList.toggle('running', running);
+    $('#timer-icon-play').hidden = running;
+    $('#timer-icon-pause').hidden = !running;
+    $('#timer-hint').textContent = running
+      ? 'Cronômetro rodando — clique para pausar.'
+      : (t.timeSpent ? ('Total acumulado: ' + fmtDuration(t.timeSpent) + '.') : 'Clique para começar a cronometrar esta atividade.');
+  }
+
+  function startTimerTick() {
+    stopTimerTick();
+    timerTickHandle = setInterval(updateTimerDisplay, 1000);
+  }
+  function stopTimerTick() {
+    if (timerTickHandle) { clearInterval(timerTickHandle); timerTickHandle = null; }
+  }
+
+  $('#btn-timer').addEventListener('click', function () {
+    var id = state.editingId;
+    if (!id) return;
+    var t = state.tasks.find(function (x) { return x.id === id; });
+    if (!t) return;
+    var patch;
+    if (t.timerStartedAt) {
+      patch = { timeSpent: elapsedSeconds(t), timerStartedAt: null };
+    } else {
+      patch = { timerStartedAt: new Date().toISOString() };
+    }
+    Object.assign(t, patch);
+    saveTask(id, patch);
+    updateTimerDisplay();
+    if (t.timerStartedAt) startTimerTick(); else stopTimerTick();
+  });
 
   function renderLinkRows() {
     var wrap = $('#links-list');
@@ -1186,8 +2192,9 @@
     renderLinkRows();
   });
 
-  $('#btn-new').addEventListener('click', function () { openTaskModal(null); });
-  $('#btn-new-dash').addEventListener('click', function () { openTaskModal(null); });
+  $('#btn-new').addEventListener('click', function () { openTaskModal(null, 'task'); });
+  $('#btn-new-dash').addEventListener('click', function () { openTaskModal(null, 'task'); });
+  $('#btn-new-post').addEventListener('click', function () { openTaskModal(null, 'post'); });
   $('#modal-close').addEventListener('click', closeTaskModal);
   $('#btn-cancel').addEventListener('click', closeTaskModal);
   $('#modal-overlay').addEventListener('click', function (e) { if (e.target === $('#modal-overlay')) closeTaskModal(); });
@@ -1196,21 +2203,34 @@
     e.preventDefault();
     var title = $('#f-title').value.trim();
     if (!title) { $('#f-title').focus(); return; }
+    var existing = state.editingId ? state.tasks.find(function (x) { return x.id === state.editingId; }) : null;
     var data = {
+      type: state.currentType,
       title: title,
       status: $('#f-status').value,
       priority: $('#f-priority').value,
       category: $('#f-category').value.trim(),
       assignee: $('#f-assignee').value.trim() || 'Eu',
+      members: $('#f-members').value.split(',').map(function (s) { return s.trim(); }).filter(Boolean),
       date: $('#f-date').value || todayISO(),
       dateEnd: $('#f-date-end').value || '',
       description: $('#f-desc').value.trim(),
       includeInReport: $('#f-report').checked,
+      checklist: checklistRows
+        .filter(function (c) { return c.text.trim(); })
+        .map(function (c) { return { text: c.text.trim(), done: !!c.done }; }),
       links: linkRows
         .filter(function (l) { return l.label.trim() || l.url.trim(); })
         .map(function (l) { return { label: l.label.trim() || 'Anexo', url: l.url.trim() }; }),
       updatedAt: new Date().toISOString()
     };
+    if (state.currentType === 'post') {
+      data.approver = $('#f-approver').value.trim();
+      data.scheduledAt = $('#f-scheduled').value || '';
+      data.approvalStatus = existing ? (existing.approvalStatus || 'pending') : 'pending';
+      data.media = mediaRows.map(function (m) { return { id: m.id, url: m.url, contentType: m.contentType }; });
+      data.igType = $('#f-ig-type').value;
+    }
     saveTask(state.editingId, data);
     closeTaskModal();
   });
@@ -1290,10 +2310,307 @@
     });
   });
 
+  /* ---------- aprovação de posts ---------- */
+
+  function updatePostsBadge() {
+    var pending = postTasks().filter(function (t) { return (t.approvalStatus || 'pending') === 'pending'; }).length;
+    var badge = $('#badge-posts');
+    if (pending > 0) { badge.textContent = pending > 99 ? '99+' : String(pending); badge.hidden = false; }
+    else { badge.hidden = true; }
+  }
+
+  $all('.pill-tab').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      state.postFilter = btn.dataset.filter;
+      $all('.pill-tab').forEach(function (b) { b.classList.toggle('active', b === btn); });
+      state.postSelection = {};
+      renderPosts();
+    });
+  });
+
+  function updateMetricoolStatusLine(t) {
+    var line = $('#metricool-status-line');
+    if (!line) return;
+    if (!t || !t.metricoolStatus || t.metricoolStatus === 'none') { line.hidden = true; return; }
+    line.hidden = false;
+    if (t.metricoolStatus === 'scheduled') {
+      line.textContent = '✓ Agendado no Instagram via Metricool.';
+      line.style.color = 'var(--approved)';
+    } else if (t.metricoolStatus === 'error') {
+      line.textContent = '⚠ Falha ao agendar no Metricool: ' + (t.metricoolError || 'erro desconhecido');
+      line.style.color = 'var(--danger)';
+    } else {
+      line.hidden = true;
+    }
+  }
+
+  function metricoolErrorMessage(err) {
+    var code = err && err.code;
+    switch (code) {
+      case 'needs_reauth':
+      case 'server_not_connected':
+        return 'Conecte/reconecte o Metricool em claude.ai → Configurações → Conectores.';
+      case 'consent_required':
+        return 'Autorize o Metricool quando o Claude perguntar, e tente de novo.';
+      case 'not_in_manifest':
+        return 'Esta página não tem permissão configurada para essa chamada ao Metricool.';
+      case 'blocked_by_policy':
+        return 'Sua organização bloqueou esse acesso ao Metricool.';
+      case 'selection_required':
+        return 'Escolha a conexão do Metricool quando o Claude perguntar, e tente de novo.';
+      case 'server_unavailable':
+        return 'Metricool indisponível agora — tente novamente em instantes.';
+      case 'tool_error':
+        return 'Metricool recusou a publicação: ' + (err.message || 'motivo não informado');
+      default:
+        return 'Não foi possível falar com o Metricool agora.';
+    }
+  }
+
+  function scheduleOnMetricool(t) {
+    var tz = (state.metricool && state.metricool.timezone) || 'America/Sao_Paulo';
+    var dateStr = t.scheduledAt.length === 16 ? (t.scheduledAt + ':00') : t.scheduledAt;
+    var offset = tzOffsetString(tz, new Date(t.scheduledAt));
+    var infoObj = {
+      autoPublish: true,
+      draft: false,
+      media: t.media.map(function (m) { return m.url; }),
+      providers: [{ network: 'instagram' }],
+      instagramData: { type: t.igType || 'POST' },
+      text: t.description || '',
+      publicationDate: { dateTime: dateStr, timezone: tz }
+    };
+    return state.mcp.callTool('Metricool Social Media Management', 'createScheduledPost', {
+      date: dateStr + offset,
+      blogId: state.metricool.blogId,
+      info: JSON.stringify(infoObj)
+    }).then(function () {
+      Object.assign(t, { metricoolStatus: 'scheduled', metricoolError: '' });
+      saveTask(t.id, { metricoolStatus: 'scheduled', metricoolError: '' });
+      showToast('Agendado no Instagram via Metricool!');
+      if (state.editingId === t.id) updateMetricoolStatusLine(t);
+    }).catch(function (err) {
+      var msg = metricoolErrorMessage(err);
+      Object.assign(t, { metricoolStatus: 'error', metricoolError: msg });
+      saveTask(t.id, { metricoolStatus: 'error', metricoolError: msg });
+      showToast('Aprovado, mas falhou o agendamento: ' + msg);
+      if (state.editingId === t.id) updateMetricoolStatusLine(t);
+    });
+  }
+
+  function approvePost(id) {
+    var t = state.tasks.find(function (x) { return x.id === id; });
+    if (!t) return Promise.resolve();
+    Object.assign(t, { approvalStatus: 'approved' });
+    saveTask(id, { approvalStatus: 'approved', updatedAt: new Date().toISOString() });
+
+    if (!state.mcp || !state.metricool || !state.metricool.blogId) {
+      showToast('Post aprovado. Conecte o Metricool em Perfil para agendar automaticamente no Instagram.');
+      return Promise.resolve();
+    }
+    if (!t.media || !t.media.length) {
+      showToast('Post aprovado, mas não agendado: o Instagram exige imagem/vídeo. Adicione a mídia e aprove de novo.');
+      return Promise.resolve();
+    }
+    if (!t.scheduledAt) {
+      showToast('Post aprovado, mas sem horário: defina "Agendar publicação" e aprove de novo.');
+      return Promise.resolve();
+    }
+    return scheduleOnMetricool(t);
+  }
+  function rejectPost(id) {
+    saveTask(id, { approvalStatus: 'rejected', updatedAt: new Date().toISOString() });
+    showToast('Post rejeitado. Se ele já tinha sido agendado no Metricool, cancele por lá também — esta página não remove um agendamento já feito.');
+  }
+
+  $('#btn-bulk-approve').addEventListener('click', function () {
+    Object.keys(state.postSelection).forEach(function (id) { if (state.postSelection[id]) approvePost(id); });
+    state.postSelection = {};
+    renderPosts();
+  });
+  $('#btn-bulk-reject').addEventListener('click', function () {
+    Object.keys(state.postSelection).forEach(function (id) { if (state.postSelection[id]) rejectPost(id); });
+    state.postSelection = {};
+    renderPosts();
+  });
+  $('#posts-select-all').addEventListener('change', function () {
+    var checked = this.checked;
+    var visible = postTasks().filter(function (t) { return state.postFilter === 'all' || (t.approvalStatus || 'pending') === state.postFilter; });
+    visible.forEach(function (t) { state.postSelection[t.id] = checked; });
+    renderPosts();
+  });
+
+  function renderPosts() {
+    var list = $('#post-list');
+    list.innerHTML = '';
+    var items = postTasks().filter(function (t) {
+      return state.postFilter === 'all' || (t.approvalStatus || 'pending') === state.postFilter;
+    });
+    items.sort(function (a, b) { return (a.scheduledAt || a.date || '').localeCompare(b.scheduledAt || b.date || ''); });
+
+    var selectedCount = Object.keys(state.postSelection).filter(function (id) { return state.postSelection[id]; }).length;
+    $('#posts-bulk-bar').hidden = selectedCount === 0;
+    $('#posts-selected-count').textContent = selectedCount + ' selecionado(s)';
+    $('#posts-select-all').checked = items.length > 0 && items.every(function (t) { return state.postSelection[t.id]; });
+
+    if (!items.length) {
+      var p = document.createElement('p');
+      p.className = 'empty-hint';
+      p.textContent = 'Nenhum post por aqui ainda. Clique em "+ Novo post" para criar um.';
+      list.appendChild(p);
+      return;
+    }
+
+    items.forEach(function (t) {
+      var row = document.createElement('div');
+      row.className = 'post-row';
+
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = !!state.postSelection[t.id];
+      cb.addEventListener('click', function (e) { e.stopPropagation(); });
+      cb.addEventListener('change', function () { state.postSelection[t.id] = cb.checked; renderPosts(); });
+      row.appendChild(cb);
+
+      var main = document.createElement('div');
+      main.className = 'post-row-main';
+      var title = document.createElement('p');
+      title.className = 'post-row-title';
+      title.textContent = t.title || '(sem título)';
+      main.appendChild(title);
+      var meta = document.createElement('div');
+      meta.className = 'post-row-meta';
+      if (t.approver) {
+        var ap = document.createElement('span');
+        ap.textContent = '👤 ' + t.approver;
+        meta.appendChild(ap);
+      }
+      if (t.scheduledAt) {
+        var sc = document.createElement('span');
+        sc.textContent = '🗓 ' + fmtDateTime(t.scheduledAt);
+        meta.appendChild(sc);
+      }
+      if (t.category) {
+        var cat = document.createElement('span');
+        cat.textContent = t.category;
+        meta.appendChild(cat);
+      }
+      main.appendChild(meta);
+      row.appendChild(main);
+
+      var chip = document.createElement('span');
+      var status = t.approvalStatus || 'pending';
+      chip.className = 'status-chip ' + status;
+      chip.textContent = status === 'pending' ? 'Pendente' : (status === 'approved' ? 'Aprovado' : 'Rejeitado');
+      row.appendChild(chip);
+
+      if (t.metricoolStatus === 'scheduled') {
+        var igChip = document.createElement('span');
+        igChip.className = 'status-chip scheduled';
+        igChip.textContent = '✓ No Instagram';
+        row.appendChild(igChip);
+      } else if (t.metricoolStatus === 'error') {
+        var igErrChip = document.createElement('span');
+        igErrChip.className = 'status-chip ig-error';
+        igErrChip.title = t.metricoolError || '';
+        igErrChip.textContent = '⚠ Erro ao agendar';
+        row.appendChild(igErrChip);
+      }
+
+      var actions = document.createElement('div');
+      actions.className = 'post-row-actions';
+      var approveBtn = document.createElement('button');
+      approveBtn.type = 'button'; approveBtn.className = 'btn btn-secondary btn-small'; approveBtn.textContent = 'Aprovar';
+      approveBtn.addEventListener('click', function (e) { e.stopPropagation(); approvePost(t.id); });
+      var rejectBtn = document.createElement('button');
+      rejectBtn.type = 'button'; rejectBtn.className = 'btn btn-ghost btn-small'; rejectBtn.textContent = 'Rejeitar';
+      rejectBtn.addEventListener('click', function (e) { e.stopPropagation(); rejectPost(t.id); });
+      actions.appendChild(approveBtn); actions.appendChild(rejectBtn);
+      row.appendChild(actions);
+
+      row.addEventListener('click', function () { openTaskModal(t.id); });
+      list.appendChild(row);
+    });
+  }
+
+  /* ---------- notificações do navegador ---------- */
+
+  function notifEnabled() {
+    try { return localStorage.getItem('ps_notif_enabled') === '1' && typeof Notification !== 'undefined' && Notification.permission === 'granted'; }
+    catch (e) { return false; }
+  }
+
+  $('#btn-enable-notif').addEventListener('click', function () {
+    if (typeof Notification === 'undefined') { showToast('Seu navegador não suporta notificações.'); return; }
+    Notification.requestPermission().then(function (perm) {
+      if (perm === 'granted') {
+        try { localStorage.setItem('ps_notif_enabled', '1'); } catch (e) {}
+        showToast('Notificações ativadas neste navegador.');
+      } else {
+        showToast('Permissão de notificação não concedida.');
+      }
+    });
+  });
+
+  /* ---------- integração metricool ---------- */
+
+  function updateMetricoolUI() {
+    var connected = !!(state.metricool && state.metricool.blogId);
+    $('#metricool-dot').classList.toggle('on', connected);
+    $('#metricool-desc').textContent = connected
+      ? ('Conectado a "' + (state.metricool.label || 'sua marca') + '". Posts do tipo Post aprovados com mídia e horário serão agendados de verdade no Instagram.')
+      : 'Conecte sua marca do Metricool para que posts aprovados no P Studio sejam agendados de verdade no Instagram.';
+    $('#btn-connect-metricool').textContent = connected ? 'Trocar marca do Metricool' : 'Buscar marcas do Metricool';
+  }
+
+  function renderMetricoolBrandList(brands) {
+    var wrap = $('#metricool-brand-list');
+    wrap.innerHTML = '';
+    if (!brands.length) { wrap.innerHTML = '<p class="hint">Nenhuma marca encontrada na sua conta Metricool.</p>'; return; }
+    brands.forEach(function (b) {
+      var opt = document.createElement('div');
+      opt.className = 'integration-brand-option';
+      if (b.image) {
+        var img = document.createElement('img'); img.src = b.image; img.alt = '';
+        opt.appendChild(img);
+      }
+      var label = document.createElement('span');
+      var ig = b.networksData && b.networksData.instagramData;
+      label.textContent = b.label + (ig ? ' · @' + ig : '');
+      opt.appendChild(label);
+      opt.addEventListener('click', function () { saveMetricoolBrand(b); });
+      wrap.appendChild(opt);
+    });
+  }
+
+  function saveMetricoolBrand(b) {
+    var data = { blogId: String(b.id), label: b.label, timezone: b.timezone || 'America/Sao_Paulo' };
+    state.metricool = data;
+    updateMetricoolUI();
+    $('#metricool-brand-list').innerHTML = '';
+    if (state.db) {
+      state.db.collection('settings').doc('metricool').set(data).catch(function () {});
+    }
+    showToast('Metricool conectado: ' + b.label);
+  }
+
+  $('#btn-connect-metricool').addEventListener('click', function () {
+    if (!state.mcp) { showToast('A conexão com o Metricool não está disponível nesta visualização (abra a página publicada pelo Claude).'); return; }
+    $('#metricool-brand-list').innerHTML = '<p class="hint">Buscando marcas…</p>';
+    state.mcp.callTool('Metricool Social Media Management', 'getBrandSettings', {}).then(function (res) {
+      var brands = (res.payload && res.payload.data) || [];
+      renderMetricoolBrandList(brands);
+    }).catch(function (err) {
+      $('#metricool-brand-list').innerHTML = '';
+      showToast(metricoolErrorMessage(err));
+    });
+  });
+
   /* ---------- summary ---------- */
 
   function buildSummaryText(from, to) {
     var items = state.tasks.filter(function (t) {
+      if (taskType(t) === 'post') return false;
       if (t.status !== 'done' || !t.includeInReport) return false;
       if (from && t.date < from) return false;
       if (to && t.date > to) return false;
@@ -1385,11 +2702,28 @@
   /* ---------- boot ---------- */
 
   function bootFromSnapshot(snap) {
+    var prevIds = {};
+    state.tasks.forEach(function (t) { prevIds[t.id] = true; });
+    var wasFirst = state.firstSnapshot;
+
     state.tasks = snap.docs.map(function (d) {
       return Object.assign({ id: d.id }, d.data() || {});
     });
     state.loaded = true;
+    state.firstSnapshot = false;
     renderBoard();
+
+    if (!wasFirst && notifEnabled()) {
+      state.tasks.forEach(function (t) {
+        if (taskType(t) === 'post' && !prevIds[t.id] && (t.approvalStatus || 'pending') === 'pending') {
+          try {
+            new Notification('Novo post para aprovar', {
+              body: (t.title || 'Post sem título') + (t.approver ? ' · aprovador: ' + t.approver : '')
+            });
+          } catch (e) {}
+        }
+      });
+    }
   }
 
   function boot() {
@@ -1416,6 +2750,9 @@
       db.collection('settings').doc('profile').get().then(function (snap) {
         if (snap.exists) applyProfile(snap.data());
       }).catch(function () {});
+      db.collection('settings').doc('metricool').get().then(function (snap) {
+        if (snap.exists) { state.metricool = snap.data(); updateMetricoolUI(); }
+      }).catch(function () {});
     }).catch(function () {
       state.loaded = true;
       renderBoard();
@@ -1427,6 +2764,14 @@
         state.downloads = downloads;
         $('#btn-download-summary').hidden = false;
       }
+    }).catch(function () {});
+
+    window.claude.use('assets').then(function (assets) {
+      if (assets) state.assets = assets;
+    }).catch(function () {});
+
+    window.claude.use('mcp').then(function (mcp) {
+      if (mcp) state.mcp = mcp;
     }).catch(function () {});
   }
 
